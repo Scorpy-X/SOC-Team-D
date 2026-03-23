@@ -44,6 +44,7 @@ served advisory backend already exists here when it does not.
 
 - `notebooks/api_tryouts.ipynb`
 - `notebooks/api_tryouts.html`
+- `notebooks/full_assets_df_analysis.ipynb`
 - `notebooks/full_assets_df_analysis.pdf`
 - `data/exports/`
 - `backend/soc_api/raw.py`

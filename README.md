@@ -14,7 +14,9 @@ questionnaire draft.
 - Week 2 summary: [`docs/submission/week-2-summary.md`](docs/submission/week-2-summary.md)
 - Questionnaire draft: [`docs/submission/Investor Questionnaire Draft - Week 2.pdf`](docs/submission/Investor%20Questionnaire%20Draft%20-%20Week%202.pdf)
 - Technical evidence notebook: [`notebooks/api_tryouts.ipynb`](notebooks/api_tryouts.ipynb)
+- Full asset-analysis notebook: [`notebooks/full_assets_df_analysis.ipynb`](notebooks/full_assets_df_analysis.ipynb)
 - Browser-friendly notebook export: [`notebooks/api_tryouts.html`](notebooks/api_tryouts.html)
+- Reviewer-friendly asset-analysis PDF: [`notebooks/full_assets_df_analysis.pdf`](notebooks/full_assets_df_analysis.pdf)
 - Data evidence: [`data/exports/`](data/exports/)
 - Problem framing note: [`docs/guides/problem-understanding.md`](docs/guides/problem-understanding.md)
 
@@ -83,6 +85,8 @@ questionnaire draft.
   - main notebook used to explore and inspect the challenge data
 - `notebooks/api_tryouts.html`
   - rendered notebook export for quick browser review
+- `notebooks/full_assets_df_analysis.ipynb`
+  - deeper asset-table analysis notebook kept as supporting technical evidence
 - `notebooks/full_assets_df_analysis.pdf`
   - one additional analysis artifact kept for reviewer-friendly evidence
 - `data/exports/`
