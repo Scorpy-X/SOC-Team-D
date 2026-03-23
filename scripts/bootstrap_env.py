@@ -110,6 +110,18 @@ def install_python_requirements() -> None:
     venv_python = ensure_venv()
     run_command([str(venv_python), "-m", "pip", "install", "--upgrade", "pip"])
     run_command([str(venv_python), "-m", "pip", "install", "-r", "requirements.txt"])
+    register_notebook_kernel(venv_python)
+
+
+def register_notebook_kernel(venv_python: Path) -> None:
+    """Register the repo-local notebook kernel for VS Code and Jupyter."""
+
+    kernel_script = ROOT_DIR / "scripts" / "register_repo_kernel.py"
+    if not kernel_script.exists():
+        print("Notebook kernel script not found. Skipping Jupyter kernel registration.")
+        return
+
+    run_command([str(venv_python), str(kernel_script)])
 
 
 def install_frontend_requirements() -> None:
@@ -174,6 +186,8 @@ def print_next_steps(skip_python: bool, skip_frontend: bool) -> None:
             print(r"Activate the Python venv with: .\scripts\Activate-Venv.ps1")
         else:
             print("Activate the Python venv with: source .venv/bin/activate")
+        print("Use the notebook kernel named: Python 3.12 (SOC Team D)")
+        print("If a live API notebook returns 403, recheck DIMENSION_DEPTHS_API_KEY in .env")
 
 
 def parse_args() -> argparse.Namespace:

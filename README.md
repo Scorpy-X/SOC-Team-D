@@ -16,7 +16,6 @@ questionnaire draft.
 - Technical evidence notebook: [`notebooks/api_tryouts.ipynb`](notebooks/api_tryouts.ipynb)
 - Full asset-analysis notebook: [`notebooks/full_assets_df_analysis.ipynb`](notebooks/full_assets_df_analysis.ipynb)
 - Browser-friendly notebook export: [`notebooks/api_tryouts.html`](notebooks/api_tryouts.html)
-- Reviewer-friendly asset-analysis PDF: [`notebooks/full_assets_df_analysis.pdf`](notebooks/full_assets_df_analysis.pdf)
 - Data evidence: [`data/exports/`](data/exports/)
 - Problem framing note: [`docs/guides/problem-understanding.md`](docs/guides/problem-understanding.md)
 
@@ -50,7 +49,8 @@ questionnaire draft.
 
 1. Double-click `Setup Dev.cmd`
 2. Add your API key to `.env` only if you want live SOC API notebook work
-3. Double-click `Run Demo.cmd` when you want the frontend
+3. In VS Code or Jupyter, select the kernel `Python 3.12 (SOC Team D)` for notebooks
+4. Double-click `Run Demo.cmd` when you want the frontend
 
 ## Script Guide
 
@@ -63,6 +63,7 @@ questionnaire draft.
   - checks Python and Node/npm
   - creates `.venv`
   - installs `requirements.txt`
+  - registers the notebook kernel `Python 3.12 (SOC Team D)`
   - installs frontend dependencies
   - creates `.env` from `.env.example` when missing
 - `Run Demo.cmd`
@@ -70,6 +71,8 @@ questionnaire draft.
   - opens the demo URL
 - `scripts/bootstrap_env.py`
   - command-line bootstrap for the full developer setup
+- `scripts/register_repo_kernel.py`
+  - registers the repo-local Jupyter kernel used by the notebooks
 - `scripts/start_demo.ps1`
   - PowerShell entrypoint behind `Run Demo.cmd`
 - `scripts/start_frontend.ps1`
@@ -87,8 +90,6 @@ questionnaire draft.
   - rendered notebook export for quick browser review
 - `notebooks/full_assets_df_analysis.ipynb`
   - deeper asset-table analysis notebook kept as supporting technical evidence
-- `notebooks/full_assets_df_analysis.pdf`
-  - one additional analysis artifact kept for reviewer-friendly evidence
 - `data/exports/`
   - exported CSV/XLSX snapshots derived from the SOC data
 - `frontend/CONTRACT.md`
@@ -124,6 +125,9 @@ cd ..
 
 The `.env` file matters only for live SOC API notebook work. The frontend demo
 path does not need an API key.
+
+If a live API notebook returns `403 Forbidden`, the API key in `.env` is
+invalid or outdated even if the notebook itself is fine.
 
 If you want to import the Python package directly from another file in this
 repo, add `backend` to `sys.path` first:
