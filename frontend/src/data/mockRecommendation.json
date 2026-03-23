@@ -1,0 +1,28 @@
+{
+  "risk_profile": {
+    "label": "Balanced",
+    "band": "balanced",
+    "life_stage": "mid_career",
+    "employment_status": "full_time_employed",
+    "monthly_income_band": "200000_350000",
+    "monthly_expenses_band": "100000_200000",
+    "savings_band": "500000_1000000",
+    "primary_goal": "grow_wealth",
+    "time_horizon": "5_plus_years",
+    "liquidity_need": "unlikely",
+    "loss_comfort": "somewhat_comfortable",
+    "investment_experience": "limited"
+  },
+  "portfolio": [
+    { "ticker": "TBILLJMD", "asset_class": "Cash", "weight": 15 },
+    { "ticker": "PVAU", "asset_class": "Fixed Income", "weight": 35 },
+    { "ticker": "WBG", "asset_class": "Equity", "weight": 25 },
+    { "ticker": "XEAK", "asset_class": "Fund", "weight": 25 }
+  ],
+  "summary": {
+    "expected_return": 0.11,
+    "volatility": 0.08,
+    "diversification_note": "Exposure is spread across cash, fixed income, equity, and fund assets."
+  },
+  "explanation": "This mock recommendation reflects a balanced profile with a mix of stability and longer-term growth exposure."
+}

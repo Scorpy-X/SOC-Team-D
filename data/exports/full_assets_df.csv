@@ -1,0 +1,26 @@
+ticker,super_class,asset_class,currency,total_expected_return,income_yield_ann,volatility_ann,semi_deviation_ann,skewness,excess_kurtosis,modified_duration,rate_beta,inflation_beta,fx_beta,expense_ratio_ann
+BQB,Equity,Emerging Market Equity,USD,0.1553,0,0.2073,0.2024,-0.335,3.9012,0,-1.3682,0.2242,1.0586,0
+CQOAC,Equity,Emerging Market Equity,USD,0.1593,0,0.2299,0.2059,-0.431,3.8945,0,-1.2466,0.1881,1.0167,0
+CWPU,Fixed Income,Short Government Bonds,JMD,0.0584,0.0584,0.0239,0.0159,0.1301,0.3887,1.2713,-1.1713,-0.4573,0,0
+DTOT,Fixed Income,Corporate Bonds,JMD,0.0938,0.0938,0.1175,0.0855,-0.3954,1.2269,5.8494,-4.2453,-0.871,0,0
+EMWB,Equity,Emerging Market Equity,USD,0.1171,0,0.2609,0.2233,-0.9292,2.1682,0,-1.9272,0.4109,1.1412,0
+GGOC,Equity,Domestic Defensive Equity,JMD,0.1017,0.0493,0.1515,0.1436,-0.3878,1.0373,0,-1.6398,0.0635,0,0
+IGRIG,Fund,Alternative Investments,"JMD,USD",0.1182,0.0252,0.1364,0.1014,-0.0985,1.4272,2.7163,-1.8297,0.4029,0.2081,0.0177
+IRKXL,Fixed Income,Corporate Bonds,JMD,0.0967,0.0967,0.0875,0.0816,-0.2455,2.3551,4.0332,-4.9758,-0.8868,0,0
+IZQLN,Equity,Domestic Cyclical Equity,JMD,0.1379,0.0107,0.1809,0.167,-0.7724,1.5611,0,0.0555,0.2845,0,0
+JFG,Fixed Income,Long Government Bonds,JMD,0.0758,0.0758,0.1165,0.1004,0.0534,1.3072,7.6073,-7.6269,-0.6074,0,0
+KBJZN,Equity,Domestic Financial Equity,JMD,0.1219,0,0.2015,0.1791,-0.4879,1.7122,0,0.4881,0.4479,0,0
+MBTTD,Equity,Domestic Cyclical Equity,JMD,0.1311,0,0.1851,0.1631,-0.4812,2.311,0,0.0891,0.5855,0,0
+MOSWO,Equity,Global Tech Equity,USD,0.1391,0,0.2876,0.2016,-0.467,2.5637,0,-1.6065,-0.3711,1.0755,0
+PDTOU,Equity,Domestic Defensive Equity,JMD,0.1096,0.0575,0.1679,0.1481,-0.2562,1.2936,0,-1.1899,0.4335,0,0
+PVAU,Fixed Income,Short Government Bonds,JMD,0.0593,0.0593,0.0362,0.0211,0.0391,0.6842,1.4402,-1.878,-0.4019,0,0
+QPESE,Fixed Income,Long Government Bonds,JMD,0.0879,0.0879,0.0755,0.0714,-0.0292,1.227,7.7215,-7.9861,-0.9893,0,0
+RJK,Equity,Global Tech Equity,USD,0.1457,0,0.2801,0.2528,-1.1072,3.8051,0,-1.3471,-0.68,1.0791,0
+TBILLJMD,Cash,JMD T-Bill,JMD,0.049,0.0375,0.0123,0.0088,-0.0532,0.078,0,0.7599,-0.1798,0,0
+TBILLUSD,Cash,USD T-Bill,USD,0.0394,0.0394,0.0071,0.0055,-0.045,0.1521,0,0.1296,-0.1418,1.0224,0
+TIHE,Equity,Domestic Financial Equity,JMD,0.1231,0.0201,0.1896,0.1517,-0.2388,1.2808,0,0.9682,0.1063,0,0
+WBG,Equity,Global Tech Equity,USD,0.1765,0,0.2509,0.2509,-0.3852,2.3916,0,-2.7984,-0.9818,0.9189,0
+XEAK,Fund,Real Estate Fund,JMD,0.1133,0.0724,0.1777,0.1325,-0.3571,1.8686,0,-1.0552,0.5085,0,0.0154
+XKFZ,Equity,Domestic Financial Equity,JMD,0.1212,0.0222,0.1745,0.1456,-0.1514,1.9004,0,0.5085,0.2095,0,0
+XPMCJ,Equity,Domestic Defensive Equity,JMD,0.1119,0.05,0.166,0.1481,-0.0817,1.89,0,-1.6244,0.047,0,0
+YTR,Equity,Domestic Cyclical Equity,JMD,0.1275,0,0.2229,0.1996,-0.632,2.9323,0,-0.1685,0.367,0,0
