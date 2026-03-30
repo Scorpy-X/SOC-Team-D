@@ -325,4 +325,15 @@ Invoke-NativeCommand -Command $pythonInfo.Command -Arguments ($pythonInfo.Argume
 
 Write-Host ""
 Write-Host "Developer setup complete."
-Write-Host "Next step: double-click Run Demo.cmd"
+if (Test-Path (Join-Path $projectRoot "Run Chainlit Experiment.cmd")) {
+    Write-Host "Next step: double-click Run Chainlit Experiment.cmd"
+}
+elseif (Test-Path (Join-Path $projectRoot "Run Demo.cmd")) {
+    Write-Host "Next step: double-click Run Demo.cmd"
+}
+if (Test-Path (Join-Path $projectRoot "Run API.cmd")) {
+    Write-Host "Optional: double-click Run API.cmd to inspect the exploratory backend."
+}
+if (Test-Path (Join-Path $projectRoot "Run Demo.cmd")) {
+    Write-Host "Secondary path: double-click Run Demo.cmd for the frontend demo."
+}

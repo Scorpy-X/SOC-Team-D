@@ -1,0 +1,138 @@
+{
+  "version": "v1",
+  "name": "Chainlit and PyPortfolio experiment defaults",
+  "optimizer": {
+    "objective": "max_sharpe",
+    "risk_free_rate": 0.0,
+    "weight_bounds": [0.0, 0.4],
+    "repair_nonpositive_semidefinite": true
+  },
+  "fallback": {
+    "retry_without_overlays": true
+  },
+  "bands": {
+    "conservative": {
+      "single_asset_cap": 0.25,
+      "min_super_class": {
+        "Cash": 0.2,
+        "Fixed Income": 0.45
+      },
+      "max_super_class": {
+        "Equity": 0.2,
+        "Fund": 0.15
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "balanced": {
+      "single_asset_cap": 0.3,
+      "min_super_class": {
+        "Cash": 0.1,
+        "Fixed Income": 0.25
+      },
+      "max_super_class": {
+        "Equity": 0.4,
+        "Fund": 0.25
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "growth": {
+      "single_asset_cap": 0.35,
+      "min_super_class": {
+        "Cash": 0.05,
+        "Fixed Income": 0.1
+      },
+      "max_super_class": {
+        "Equity": 0.55,
+        "Fund": 0.3
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "aggressive": {
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.0,
+        "Fixed Income": 0.05
+      },
+      "max_super_class": {
+        "Equity": 0.7,
+        "Fund": 0.35
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    }
+  },
+  "overlays": {
+    "investment_horizon": {
+      "lt_3": {
+        "label": "Short horizon safeguard",
+        "min_super_class": {
+          "Cash": 0.3
+        },
+        "max_super_class": {
+          "Equity": 0.15
+        },
+        "max_metrics": {
+          "modified_duration": 2.0
+        }
+      },
+      "years_3_5": {
+        "label": "Medium-short horizon safeguard",
+        "min_super_class": {
+          "Cash": 0.2
+        },
+        "max_super_class": {
+          "Equity": 0.25
+        },
+        "max_metrics": {
+          "modified_duration": 3.0
+        }
+      }
+    },
+    "liquidity_need": {
+      "emergency_fund": {
+        "label": "Emergency liquidity safeguard",
+        "min_super_class": {
+          "Cash": 0.3
+        },
+        "max_metrics": {
+          "modified_duration": 2.0
+        }
+      },
+      "major_expense_soon": {
+        "label": "Near-term expense safeguard",
+        "min_super_class": {
+          "Cash": 0.2
+        },
+        "max_metrics": {
+          "modified_duration": 3.0
+        }
+      },
+      "special_goal": {
+        "label": "Goal stability safeguard",
+        "min_super_class": {
+          "Cash": 0.1
+        },
+        "max_metrics": {
+          "modified_duration": 4.5
+        }
+      }
+    },
+    "income_vs_growth": {
+      "income_now": {
+        "label": "Income-first overlay",
+        "min_metrics": {
+          "income_yield_ann": 0.055
+        }
+      },
+      "mostly_income": {
+        "label": "Income-leaning overlay",
+        "min_metrics": {
+          "income_yield_ann": 0.045
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,420 @@
+{
+  "version": "v2",
+  "title": "Investor Profiling Questionnaire",
+  "description": "Current Chainlit questionnaire aligned to the single-choice items from Barita SOC(2). Numeric and free-text items from the DOCX are still deferred in this chat flow.",
+  "questions": [
+    {
+      "id": "portfolio_purpose",
+      "order": 1,
+      "text": "What is the main purpose of this portfolio?",
+      "help_text": "This captures what the money is mainly meant to support.",
+      "type": "single_choice",
+      "dimension": "portfolio_purpose",
+      "required": true,
+      "options": [
+        {
+          "id": "major_purchase",
+          "label": "To make a major purchase",
+          "description": "The money may be needed for a specific future expense."
+        },
+        {
+          "id": "retirement",
+          "label": "To save for retirement",
+          "description": "The portfolio is aimed at future retirement needs."
+        },
+        {
+          "id": "wealth_building",
+          "label": "To build long-term wealth",
+          "description": "The main goal is long-term capital growth."
+        },
+        {
+          "id": "other_goal",
+          "label": "Other goal",
+          "description": "The purpose does not fit neatly into the listed categories."
+        }
+      ]
+    },
+    {
+      "id": "goal_time_horizon",
+      "order": 2,
+      "text": "What is the time horizon for this goal?",
+      "help_text": "This helps show how much time the portfolio has to recover from market swings.",
+      "type": "single_choice",
+      "dimension": "goal_time_horizon",
+      "required": true,
+      "options": [
+        {
+          "id": "years_5_or_less",
+          "label": "5 years or less",
+          "description": "Short time horizon."
+        },
+        {
+          "id": "years_6_to_9",
+          "label": "6 to 9 years",
+          "description": "Medium time horizon."
+        },
+        {
+          "id": "years_10_plus",
+          "label": "10 or more years",
+          "description": "Long time horizon."
+        }
+      ]
+    },
+    {
+      "id": "age_band",
+      "order": 3,
+      "text": "Which age range are you in?",
+      "help_text": "This is one of the risk-capacity signals in the current draft questionnaire.",
+      "type": "single_choice",
+      "dimension": "age_band",
+      "required": true,
+      "options": [
+        {
+          "id": "under_20",
+          "label": "Less than 20",
+          "description": "Very early life stage."
+        },
+        {
+          "id": "years_20_29",
+          "label": "20-29",
+          "description": "Early career stage."
+        },
+        {
+          "id": "years_30_39",
+          "label": "30-39",
+          "description": "Mid-career stage."
+        },
+        {
+          "id": "years_40_49",
+          "label": "40-49",
+          "description": "Later accumulation stage."
+        },
+        {
+          "id": "years_50_59",
+          "label": "50-59",
+          "description": "Approaching retirement."
+        },
+        {
+          "id": "years_60_plus",
+          "label": "60+",
+          "description": "Later-life stage."
+        }
+      ]
+    },
+    {
+      "id": "income_stability",
+      "order": 4,
+      "text": "How stable is your income outside this portfolio?",
+      "help_text": "This helps estimate how dependent you are on the portfolio for near-term needs.",
+      "type": "single_choice",
+      "dimension": "income_stability",
+      "required": true,
+      "options": [
+        {
+          "id": "stable",
+          "label": "Stable",
+          "description": "Reliable outside income."
+        },
+        {
+          "id": "somewhat_stable",
+          "label": "Somewhat stable",
+          "description": "Income is present but not perfectly consistent."
+        },
+        {
+          "id": "unstable",
+          "label": "Unstable",
+          "description": "Income is irregular or uncertain."
+        }
+      ]
+    },
+    {
+      "id": "investment_phase",
+      "order": 5,
+      "text": "Which phase of your investment life best fits you right now?",
+      "help_text": "This is the DOCX income-versus-growth question phrased for direct chat use.",
+      "type": "single_choice",
+      "dimension": "investment_phase",
+      "required": true,
+      "options": [
+        {
+          "id": "accumulation",
+          "label": "Capital accumulation",
+          "description": "The focus is still mainly on growth."
+        },
+        {
+          "id": "disbursement",
+          "label": "Capital disbursement",
+          "description": "The focus is more on drawing income or spending from assets."
+        }
+      ]
+    },
+    {
+      "id": "major_expense_withdrawal",
+      "order": 6,
+      "text": "Over the next 12-24 months, what share of this portfolio do you expect to withdraw for major expenses?",
+      "help_text": "The DOCX mentions house, education, and lifestyle expenses here. The live chat uses a percentage bucket instead of a numeric input for now.",
+      "type": "single_choice",
+      "dimension": "major_expense_withdrawal",
+      "required": true,
+      "options": [
+        {
+          "id": "under_5_pct",
+          "label": "Less than 5%",
+          "description": "Very low near-term withdrawal pressure."
+        },
+        {
+          "id": "pct_6_9",
+          "label": "6-9%",
+          "description": "Low withdrawal pressure."
+        },
+        {
+          "id": "pct_10_14",
+          "label": "10-14%",
+          "description": "Moderate withdrawal pressure."
+        },
+        {
+          "id": "pct_15_25",
+          "label": "15-25%",
+          "description": "High withdrawal pressure."
+        },
+        {
+          "id": "over_25_pct",
+          "label": "More than 25%",
+          "description": "Very high withdrawal pressure."
+        }
+      ]
+    },
+    {
+      "id": "emergency_fund_months",
+      "order": 7,
+      "text": "How many months of essential expenses do you already have set aside for emergencies?",
+      "help_text": "This is one of the DOCX liquidity-capacity questions.",
+      "type": "single_choice",
+      "dimension": "emergency_fund_months",
+      "required": true,
+      "options": [
+        {
+          "id": "months_0",
+          "label": "0 months",
+          "description": "No separate emergency reserve yet."
+        },
+        {
+          "id": "months_1_3",
+          "label": "1-3 months",
+          "description": "Small emergency buffer."
+        },
+        {
+          "id": "months_4_6",
+          "label": "4 to 6 months",
+          "description": "Moderate emergency buffer."
+        },
+        {
+          "id": "months_6_plus",
+          "label": "More than 6 months",
+          "description": "Strong emergency buffer."
+        }
+      ]
+    },
+    {
+      "id": "risk_willingness",
+      "order": 8,
+      "text": "How willing are you to take financial risk or lose money in this portfolio?",
+      "help_text": "This is the direct risk-tolerance question from the DOCX.",
+      "type": "single_choice",
+      "dimension": "risk_willingness",
+      "required": true,
+      "options": [
+        {
+          "id": "very_low",
+          "label": "Very low",
+          "description": "Very little willingness to accept losses."
+        },
+        {
+          "id": "low",
+          "label": "Low",
+          "description": "Limited willingness to accept losses."
+        },
+        {
+          "id": "moderate",
+          "label": "Moderate",
+          "description": "Balanced willingness to accept losses."
+        },
+        {
+          "id": "high",
+          "label": "High",
+          "description": "Comfortable with a meaningful level of risk."
+        },
+        {
+          "id": "very_high",
+          "label": "Very high",
+          "description": "Very comfortable with investment risk."
+        }
+      ]
+    },
+    {
+      "id": "risky_asset_preference",
+      "order": 9,
+      "text": "When holding risky assets, which preference fits you best?",
+      "help_text": "This asks whether you lean more toward safety or return when risk is involved.",
+      "type": "single_choice",
+      "dimension": "risky_asset_preference",
+      "required": true,
+      "options": [
+        {
+          "id": "maximize_safety",
+          "label": "Maximize safety",
+          "description": "Protection matters most."
+        },
+        {
+          "id": "mostly_safety",
+          "label": "Mostly safety",
+          "description": "Safety matters more than return."
+        },
+        {
+          "id": "mix_safety_return",
+          "label": "Mix of safety and return",
+          "description": "Neither goal clearly dominates."
+        },
+        {
+          "id": "mostly_return",
+          "label": "Mostly return",
+          "description": "Return matters more than safety."
+        },
+        {
+          "id": "maximize_return",
+          "label": "Maximize returns",
+          "description": "Return matters most."
+        }
+      ]
+    },
+    {
+      "id": "financial_knowledge",
+      "order": 10,
+      "text": "How knowledgeable are you about financial and investment concepts?",
+      "help_text": "This is asked directly in the DOCX risk-tolerance section.",
+      "type": "single_choice",
+      "dimension": "financial_knowledge",
+      "required": true,
+      "options": [
+        {
+          "id": "not_knowledgeable",
+          "label": "Not at all knowledgeable",
+          "description": "Very limited familiarity with finance and investing."
+        },
+        {
+          "id": "minimally_knowledgeable",
+          "label": "Minimally knowledgeable",
+          "description": "Some familiarity, but still limited."
+        },
+        {
+          "id": "moderately_knowledgeable",
+          "label": "Moderately knowledgeable",
+          "description": "Comfortable with common investing ideas."
+        },
+        {
+          "id": "competent",
+          "label": "Competent",
+          "description": "Strong practical understanding."
+        },
+        {
+          "id": "very_knowledgeable",
+          "label": "Very knowledgeable",
+          "description": "Very comfortable with financial concepts."
+        }
+      ]
+    },
+    {
+      "id": "investment_experience",
+      "order": 11,
+      "text": "How much experience do you have with investment products?",
+      "help_text": "This is still single-choice in the live chat version.",
+      "type": "single_choice",
+      "dimension": "investment_experience",
+      "required": true,
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "description": "No meaningful investing experience yet."
+        },
+        {
+          "id": "some",
+          "label": "Some",
+          "description": "Some exposure or hands-on experience."
+        },
+        {
+          "id": "extensive",
+          "label": "Extensive",
+          "description": "A lot of investment experience."
+        }
+      ]
+    },
+    {
+      "id": "stock_market_view",
+      "order": 12,
+      "text": "What is your opinion of the stock market?",
+      "help_text": "This reflects how risky or safe the investor perceives the market to be.",
+      "type": "single_choice",
+      "dimension": "stock_market_view",
+      "required": true,
+      "options": [
+        {
+          "id": "very_risky",
+          "label": "Very risky",
+          "description": "The stock market feels highly dangerous."
+        },
+        {
+          "id": "somewhat_risky",
+          "label": "Somewhat risky",
+          "description": "The market still feels risky overall."
+        },
+        {
+          "id": "neutral",
+          "label": "Neutral",
+          "description": "No strong positive or negative view."
+        },
+        {
+          "id": "somewhat_safe",
+          "label": "Somewhat safe",
+          "description": "The market feels manageable."
+        },
+        {
+          "id": "very_safe",
+          "label": "Very safe",
+          "description": "The market feels comfortable and safe."
+        }
+      ]
+    },
+    {
+      "id": "loss_response",
+      "order": 13,
+      "text": "In the past, when faced with investment losses, what action did you take?",
+      "help_text": "This is the final behavioral loss-tolerance question from the DOCX.",
+      "type": "single_choice",
+      "dimension": "loss_response",
+      "required": true,
+      "options": [
+        {
+          "id": "sold_out",
+          "label": "Sold out",
+          "description": "Exited the position after losses."
+        },
+        {
+          "id": "sold_some",
+          "label": "Sold some",
+          "description": "Reduced exposure after losses."
+        },
+        {
+          "id": "did_nothing",
+          "label": "Did nothing",
+          "description": "Stayed invested without changing position."
+        },
+        {
+          "id": "purchased_more",
+          "label": "Purchased more",
+          "description": "Added to the investment after prices fell."
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 """Create the local Python venv and install repo dependencies.
 
-This is the developer bootstrap path. It creates `.venv`, installs Python
-requirements, optionally installs frontend npm dependencies, and copies `.env`
-from `.env.example` when needed.
+This is the developer bootstrap path. It creates `.venv`, installs the base
+Python requirements plus the Chainlit experiment extras, optionally installs
+frontend npm dependencies, and copies `.env` from `.env.example` when needed.
 
 Use it from the repo root:
 
@@ -29,6 +29,8 @@ VENV_DIR = ROOT_DIR / ".venv"
 FRONTEND_DIR = ROOT_DIR / "frontend"
 ENV_FILE = ROOT_DIR / ".env"
 ENV_EXAMPLE_FILE = ROOT_DIR / ".env.example"
+REQUIREMENTS_FILE = ROOT_DIR / "requirements.txt"
+CHAINLIT_REQUIREMENTS_FILE = ROOT_DIR / "requirements-chainlit.txt"
 
 
 def run_command(command: list[str], *, cwd: Path | None = None) -> None:
@@ -103,13 +105,25 @@ def get_node_version() -> str | None:
     return completed.stdout.strip() or None
 
 
+def install_requirements_file(venv_python: Path, requirements_file: Path) -> None:
+    """Install one requirements file into the repo-local virtual environment."""
+
+    if not requirements_file.exists():
+        raise FileNotFoundError(f"Could not find requirements file at {requirements_file}")
+
+    run_command([str(venv_python), "-m", "pip", "install", "-r", str(requirements_file)])
+
+
 def install_python_requirements() -> None:
     """Create the venv and install the repo Python requirements."""
 
     ensure_env_file()
     venv_python = ensure_venv()
     run_command([str(venv_python), "-m", "pip", "install", "--upgrade", "pip"])
-    run_command([str(venv_python), "-m", "pip", "install", "-r", "requirements.txt"])
+    install_requirements_file(venv_python, REQUIREMENTS_FILE)
+    # Keep the experiment extras in their own file, but install them during
+    # the full developer bootstrap so the Week 3 prototype stays runnable.
+    install_requirements_file(venv_python, CHAINLIT_REQUIREMENTS_FILE)
     register_notebook_kernel(venv_python)
 
 
@@ -179,7 +193,7 @@ def print_next_steps(skip_python: bool, skip_frontend: bool) -> None:
     print("\nSetup complete.")
 
     if not skip_frontend and (ROOT_DIR / "Run Demo.cmd").exists():
-        print("Start the demo UI with: Run Demo.cmd")
+        print("Start the secondary frontend demo with: Run Demo.cmd")
 
     if not skip_python:
         if os.name == "nt":
@@ -188,6 +202,10 @@ def print_next_steps(skip_python: bool, skip_frontend: bool) -> None:
             print("Activate the Python venv with: source .venv/bin/activate")
         print("Use the notebook kernel named: Python 3.12 (SOC Team D)")
         print("If a live API notebook returns 403, recheck DIMENSION_DEPTHS_API_KEY in .env")
+        if (ROOT_DIR / "Run Chainlit Experiment.cmd").exists():
+            print("Start the primary Week 3 prototype with: Run Chainlit Experiment.cmd")
+        if (ROOT_DIR / "Run API.cmd").exists():
+            print("Inspect the exploratory backend with: Run API.cmd")
 
 
 def parse_args() -> argparse.Namespace:

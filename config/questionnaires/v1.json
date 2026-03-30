@@ -1,0 +1,208 @@
+{
+  "version": "v1",
+  "title": "Investor Profiling Questionnaire",
+  "description": "Week 2 baseline questionnaire for collecting structured investor answers before any portfolio recommendation is generated.",
+  "questions": [
+    {
+      "id": "investment_horizon",
+      "order": 1,
+      "text": "In how many years will you need to start withdrawing funds from this account?",
+      "help_text": "This helps us judge how much time the portfolio has to recover from market swings.",
+      "type": "single_choice",
+      "dimension": "investment_horizon",
+      "required": true,
+      "options": [
+        {
+          "id": "lt_3",
+          "label": "Less than 3 years",
+          "description": "Short timeline. The portfolio should stay safer and more liquid."
+        },
+        {
+          "id": "years_3_5",
+          "label": "3-5 years",
+          "description": "Still a fairly short horizon."
+        },
+        {
+          "id": "years_6_10",
+          "label": "6-10 years",
+          "description": "Moderate timeline with some room for market fluctuations."
+        },
+        {
+          "id": "years_11_plus",
+          "label": "11+ years",
+          "description": "Long timeline. The portfolio can generally tolerate more volatility."
+        }
+      ]
+    },
+    {
+      "id": "investment_knowledge",
+      "order": 2,
+      "text": "How would you describe your investment knowledge?",
+      "help_text": "This is not the same as risk tolerance, but it helps explain how confidently someone may handle volatility.",
+      "type": "single_choice",
+      "dimension": "investment_knowledge",
+      "required": true,
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "description": "Very little familiarity with investment concepts."
+        },
+        {
+          "id": "limited",
+          "label": "Limited",
+          "description": "Some awareness but not much hands-on experience."
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Comfortable with common investment ideas."
+        },
+        {
+          "id": "extensive",
+          "label": "Extensive",
+          "description": "Strong familiarity with investing."
+        }
+      ]
+    },
+    {
+      "id": "risk_mindset",
+      "order": 3,
+      "text": "When you hear \"risk\" related to your finances, what comes closest to your view?",
+      "help_text": "This captures stated risk tolerance.",
+      "type": "single_choice",
+      "dimension": "risk_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "capital_preservation",
+          "label": "I worry that I could be left with too little.",
+          "description": "Strong preference for safety."
+        },
+        {
+          "id": "risk_is_normal",
+          "label": "I understand that risk is part of investing.",
+          "description": "Comfortable with moderate uncertainty."
+        },
+        {
+          "id": "risk_opportunity",
+          "label": "I see risk as the path to stronger returns.",
+          "description": "More willing to accept volatility."
+        },
+        {
+          "id": "risk_thrill",
+          "label": "I enjoy the excitement of investing.",
+          "description": "Very high appetite for risk."
+        }
+      ]
+    },
+    {
+      "id": "drawdown_response",
+      "order": 4,
+      "text": "What would you most likely do if your investments fell by 20% over a short period?",
+      "help_text": "This captures loss tolerance using a concrete scenario.",
+      "type": "single_choice",
+      "dimension": "loss_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "sell_everything",
+          "label": "Sell everything",
+          "description": "Very low loss tolerance."
+        },
+        {
+          "id": "sell_some",
+          "label": "Sell some",
+          "description": "Low-to-moderate loss tolerance."
+        },
+        {
+          "id": "do_nothing",
+          "label": "Do nothing",
+          "description": "Moderate tolerance for losses."
+        },
+        {
+          "id": "rebalance",
+          "label": "Rebalance the portfolio",
+          "description": "Comfortable reacting methodically."
+        },
+        {
+          "id": "buy_more",
+          "label": "Buy more while prices are lower",
+          "description": "High loss tolerance."
+        }
+      ]
+    },
+    {
+      "id": "income_vs_growth",
+      "order": 5,
+      "text": "Which outcome matters more for this account?",
+      "help_text": "This tells us whether the portfolio should lean toward current income or long-term growth.",
+      "type": "single_choice",
+      "dimension": "income_vs_growth",
+      "required": true,
+      "options": [
+        {
+          "id": "income_now",
+          "label": "Regular income now or very soon",
+          "description": "Priority is current cash flow."
+        },
+        {
+          "id": "mostly_income",
+          "label": "Mostly income with some growth",
+          "description": "Income matters more than capital appreciation."
+        },
+        {
+          "id": "balanced",
+          "label": "A balanced mix of income and growth",
+          "description": "Neither objective clearly dominates."
+        },
+        {
+          "id": "mostly_growth",
+          "label": "Mostly growth with some income",
+          "description": "Growth matters more than cash flow."
+        },
+        {
+          "id": "growth",
+          "label": "Long-term growth",
+          "description": "Priority is capital appreciation."
+        }
+      ]
+    },
+    {
+      "id": "liquidity_need",
+      "order": 6,
+      "text": "Which statement best matches why this money is being invested?",
+      "help_text": "This helps decide how much liquidity and stability the portfolio should preserve.",
+      "type": "single_choice",
+      "dimension": "liquidity_need",
+      "required": true,
+      "options": [
+        {
+          "id": "emergency_fund",
+          "label": "This money is a safety net for emergencies.",
+          "description": "Very high need for liquidity and stability."
+        },
+        {
+          "id": "major_expense_soon",
+          "label": "I expect to use this for a major expense soon.",
+          "description": "High need for capital preservation."
+        },
+        {
+          "id": "special_goal",
+          "label": "I have a large future goal like a house, car, or wedding.",
+          "description": "Moderate need for stability."
+        },
+        {
+          "id": "retirement_later",
+          "label": "I want this to grow for retirement later on.",
+          "description": "Longer-term objective."
+        },
+        {
+          "id": "long_term_wealth",
+          "label": "I mainly want to build long-term wealth.",
+          "description": "Lowest liquidity pressure."
+        }
+      ]
+    }
+  ]
+}

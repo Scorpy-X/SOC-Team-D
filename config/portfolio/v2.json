@@ -1,0 +1,117 @@
+{
+  "version": "v2",
+  "name": "Variant B band-only allocation defaults",
+  "band_order": [
+    "very_conservative",
+    "conservative",
+    "balanced",
+    "growth",
+    "aggressive"
+  ],
+  "optimizer": {
+    "objective": "max_sharpe",
+    "risk_free_rate": 0.0,
+    "weight_bounds": [0.0, 0.4],
+    "repair_nonpositive_semidefinite": true
+  },
+  "fallback": {
+    "retry_without_overlays": false
+  },
+  "bands": {
+    "very_conservative": {
+      "label": "Very Conservative",
+      "description": "Highest stability tilt. Keeps most of the portfolio in cash and high-quality fixed income, with only a small equity allowance.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.2,
+        "Fixed Income": 0.6,
+        "Equity": 0.0,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.3,
+        "Fixed Income": 0.7,
+        "Equity": 0.1,
+        "Fund": 0.0
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "conservative": {
+      "label": "Conservative",
+      "description": "Stability-first profile with room for some equity exposure while keeping cash and fixed income as the core anchor.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.1,
+        "Fixed Income": 0.5,
+        "Equity": 0.2,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.2,
+        "Fixed Income": 0.6,
+        "Equity": 0.3,
+        "Fund": 0.0
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "balanced": {
+      "label": "Balanced",
+      "description": "Middle-ground profile with meaningful equity exposure while still preserving visible cash and fixed-income support.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.05,
+        "Fixed Income": 0.35,
+        "Equity": 0.4,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.1,
+        "Fixed Income": 0.5,
+        "Equity": 0.6,
+        "Fund": 0.0
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "growth": {
+      "label": "Growth",
+      "description": "Growth-oriented profile with a clear equity majority, while still allowing some cash and fixed income for stability.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.0,
+        "Fixed Income": 0.1,
+        "Equity": 0.6,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.1,
+        "Fixed Income": 0.3,
+        "Equity": 0.8,
+        "Fund": 0.0
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "aggressive": {
+      "label": "Aggressive",
+      "description": "Highest growth tilt. Keeps the portfolio heavily in equities, with only small allowances for cash and fixed income.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.0,
+        "Fixed Income": 0.0,
+        "Equity": 0.85,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.05,
+        "Fixed Income": 0.15,
+        "Equity": 1.0,
+        "Fund": 0.0
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "version": "v2",
+  "name": "Week 2 provisional scoring with four investor bands",
+  "question_scores": {
+    "investment_horizon": {
+      "lt_3": 0,
+      "years_3_5": 1,
+      "years_6_10": 2,
+      "years_11_plus": 3
+    },
+    "investment_knowledge": {
+      "none": 0,
+      "limited": 1,
+      "good": 2,
+      "extensive": 3
+    },
+    "risk_mindset": {
+      "capital_preservation": 0,
+      "risk_is_normal": 2,
+      "risk_opportunity": 3,
+      "risk_thrill": 4
+    },
+    "drawdown_response": {
+      "sell_everything": 0,
+      "sell_some": 1,
+      "do_nothing": 2,
+      "rebalance": 3,
+      "buy_more": 4
+    },
+    "income_vs_growth": {
+      "income_now": 0,
+      "mostly_income": 1,
+      "balanced": 2,
+      "mostly_growth": 3,
+      "growth": 4
+    },
+    "liquidity_need": {
+      "emergency_fund": 0,
+      "major_expense_soon": 1,
+      "special_goal": 2,
+      "retirement_later": 3,
+      "long_term_wealth": 4
+    }
+  },
+  "profile_bands": [
+    {
+      "id": "conservative",
+      "label": "Conservative",
+      "min_score": 0,
+      "max_score": 6,
+      "description": "Short timelines, stronger liquidity pressure, or lower comfort with loss suggest a safer allocation with higher stability."
+    },
+    {
+      "id": "balanced",
+      "label": "Balanced",
+      "min_score": 7,
+      "max_score": 12,
+      "description": "The answers support measured market risk, but still require a meaningful stability anchor."
+    },
+    {
+      "id": "growth",
+      "label": "Growth",
+      "min_score": 13,
+      "max_score": 17,
+      "description": "Longer timelines and stronger loss tolerance support a growth-oriented allocation."
+    },
+    {
+      "id": "aggressive",
+      "label": "Aggressive",
+      "min_score": 18,
+      "max_score": 22,
+      "description": "Very strong comfort with volatility and a longer horizon support a more aggressive allocation stance."
+    }
+  ],
+  "reason_rules": [
+    {
+      "question_id": "investment_horizon",
+      "option_ids": ["years_6_10", "years_11_plus"],
+      "text": "A longer investment horizon usually gives the portfolio more time to recover from market swings."
+    },
+    {
+      "question_id": "investment_horizon",
+      "option_ids": ["lt_3", "years_3_5"],
+      "text": "A shorter investment horizon usually pushes the portfolio toward greater stability and capital preservation."
+    },
+    {
+      "question_id": "drawdown_response",
+      "option_ids": ["sell_everything", "sell_some"],
+      "text": "Your drawdown response suggests lower loss tolerance, so large swings should be treated carefully."
+    },
+    {
+      "question_id": "drawdown_response",
+      "option_ids": ["rebalance", "buy_more"],
+      "text": "Your drawdown response suggests you can stay disciplined through volatility, which supports taking somewhat more investment risk."
+    },
+    {
+      "question_id": "income_vs_growth",
+      "option_ids": ["income_now", "mostly_income"],
+      "text": "Because current income matters, the final portfolio should not be purely growth-driven."
+    },
+    {
+      "question_id": "income_vs_growth",
+      "option_ids": ["mostly_growth", "growth"],
+      "text": "A stronger growth preference supports holding more growth-oriented assets when the rest of the profile allows it."
+    },
+    {
+      "question_id": "liquidity_need",
+      "option_ids": ["emergency_fund", "major_expense_soon"],
+      "text": "A higher liquidity need means the final recommendation should preserve flexibility and avoid excessive volatility."
+    },
+    {
+      "question_id": "liquidity_need",
+      "option_ids": ["retirement_later", "long_term_wealth"],
+      "text": "Because the money is aimed at a longer-term goal, the portfolio may be able to accept more investment risk."
+    }
+  ]
+}
