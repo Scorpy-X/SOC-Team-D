@@ -1,46 +1,31 @@
-# Chainlit + PyPortfolio Prototype Docs
+# Chat-Based Prototype Docs
 
-This folder documents the current active Week 4 prototype in `SOC Team D`.
+This folder explains the current Week 4 advisor prototype in plain language.
 
-The active flow is:
+At a high level, the prototype works like this:
 
-`typed questions -> numeric confirm where needed -> review/edit -> manual mock band selection -> Variant B allocation -> holdings`
+1. the user answers a short questionnaire in a chat window
+2. money amounts are checked and confirmed before they are saved
+3. the user reviews the answers and can change one if needed
+4. the user chooses a draft investor profile
+5. the system produces a sample portfolio inside the limits for that profile
 
-## What This Week 4 Prototype Does
+## What This Prototype Does
 
-- runs a Chainlit chat UI
-- uses the typed `v3` questionnaire with single-choice and numeric amount inputs
-- saves questionnaire answers live into the exploratory backend SQLite database
-- asks the user to confirm parsed currency amounts before saving them
-- lets the user review numbered answers and change them by question number
-- lets the user choose one of five draft investor bands manually
-- applies the Variant B class ranges from `config/portfolio/v2.json`
-- runs `PyPortfolioOpt` against live SOC data when available, with CSV snapshots as backup
-- returns a portfolio recommendation with holdings, metrics, active constraints, and notes
+- runs a chat-based questionnaire
+- accepts both multiple-choice answers and money amount answers
+- saves answers as the conversation goes
+- lets the user review numbered answers and update them by question number
+- lets the user choose one of five draft investor profiles manually
+- returns a sample portfolio with holdings, summary metrics, and policy limits
 
-## Current Truth
+## What Is Important To Know
 
-- the question-to-band pipeline is **not** the primary demo path yet
-- the active demo path uses **manual mock band selection**
-- the old scoring config still exists as a backend fallback, but it is not the main Week 4 story
-- the active Variant B path has **no answer-based overlays**
-- the active policy disallows `Fund` exposure for now
-- numeric liquidity inputs are now captured and reviewable
-- those numeric liquidity inputs are **not yet used** in the active scoring/allocation path
-- true free-text narrative answers are still deferred
-
-## Active Versions
-
-- questionnaire: `config/questionnaires/v3.json`
-- scoring fallback: `config/scoring/v4.json`
-- portfolio policy: `config/portfolio/v2.json`
-
-## Launch Path
-
-For the main Week 4 prototype:
-
-1. double-click `Setup Dev.cmd`
-2. double-click `Run Chainlit Experiment.cmd`
+- the current demo still uses manual profile selection
+- the questionnaire does not yet assign the final profile automatically
+- money amount answers are collected and reviewed, but they do not yet change the portfolio recommendation
+- free-text narrative answers are still not part of the live prototype
+- the system tries to use live SOC data first and falls back to the saved local dataset if the live source is unavailable
 
 ## Read These First
 
@@ -53,27 +38,17 @@ For the main Week 4 prototype:
 7. `portfolio-policy-matrix.md`
 8. `chainlit-flow.md`
 9. `worked-examples.md`
-10. `data-usage.md`
 
-## Main Prototype Files
+## Technical Note
+
+Current active configuration:
+
+- questionnaire: `config/questionnaires/v3.json`
+- scoring fallback: `config/scoring/v4.json`
+- portfolio policy: `config/portfolio/v2.json`
+
+Main prototype files:
 
 - `experiments/chainlit_chat/chat_app.py`
 - `backend/soc_advisor/`
-- `config/questionnaires/v3.json`
-- `config/portfolio/v2.json`
-- `config/scoring/v4.json`
 - `tests/`
-
-## Important Boundary
-
-This repo presents the Chainlit/backend path as the Week 4 integrated
-prototype, but it is still an exploratory advisory system rather than a
-finalized production product.
-
-Keep stating the current limitations honestly:
-
-- manual mock band selection is still active
-- final question-to-band scoring is not final
-- numeric amount inputs do not yet drive allocation
-- covariance PSD repair is applied before optimization
-- expected returns are estimates, not guarantees
