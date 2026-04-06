@@ -1,4 +1,19 @@
-"""FastAPI entry point for the SOC advisor backend scaffold."""
+"""FastAPI entry point for the SOC advisor backend scaffold.
+
+This file is deliberately thin.
+
+It owns:
+
+- app setup
+- route definitions
+- wiring request payloads to service-layer helpers
+
+It does not own:
+
+- questionnaire logic
+- scoring logic
+- portfolio allocation logic
+"""
 
 from __future__ import annotations
 
@@ -31,10 +46,12 @@ from .settings import get_settings
 
 
 settings = get_settings()
+# FastAPI is only the HTTP shell around the service layer. The advisor logic
+# still lives in `services.py` and `portfolio.py`.
 app = FastAPI(
     title="SOC Advisor Backend",
     version="0.1.0",
-    description="Config-driven backend scaffold for the SOC week 2 questionnaire flow.",
+    description="Config-driven backend scaffold for the active SOC questionnaire and allocation flow.",
 )
 
 app.add_middleware(
@@ -44,6 +61,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+#
+# App lifecycle and simple status routes
+#
 
 
 @app.on_event("startup")
@@ -74,6 +96,11 @@ def health() -> dict[str, str]:
         "scoring_version": settings.scoring_version,
         "portfolio_version": settings.portfolio_version,
     }
+
+
+#
+# Questionnaire and session routes
+#
 
 
 @app.get("/questionnaire", response_model=QuestionnaireResponse)
@@ -147,8 +174,14 @@ def save_answer(
         questionnaire=questionnaire,
         question_id=payload.question_id,
         option_id=payload.option_id,
+        numeric_value=payload.numeric_value,
     )
     return build_session_state(updated_session, questionnaire)
+
+
+#
+# Submit and recommendation routes
+#
 
 
 @app.post("/sessions/{session_id}/submit", response_model=SubmitSessionResponse)

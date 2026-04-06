@@ -1,7 +1,5 @@
 # Allocation Methodology And Testing
 
-This note describes the current Week 3 integrated prototype in `SOC Team D`.
-
 This note is for presentation, defense, and product hardening.
 
 It answers four practical questions:
@@ -97,16 +95,16 @@ This means you should understand the code path clearly, even if you do not know 
 
 ## The current allocator step by step
 
-The active allocator path is in `backend/soc_advisor/portfolio.py`.
+The active allocator path is in [`portfolio.py`](C:/Users/ronhu/projects/soc-local/SOC-Team-D/backend/soc_advisor/portfolio.py).
 
 In plain language, the current flow is:
 
 1.  `build_recommendation()` starts the allocation run.
 2.  `load_portfolio_config()` loads the active policy file:
-    - `config/portfolio/v2.json`
-3.  `load_snapshot_frames()` loads:
-    - `data/exports/full_assets_df.csv`
-    - `data/exports/full_asset_covariance_df.csv`
+    - [`v2.json`](C:/Users/ronhu/projects/soc-local/SOC-Team-D/config/portfolio/v2.json)
+3.  `load_portfolio_frames()` tries the live SOC API first, then falls back to:
+    - [`full_assets_df.csv`](C:/Users/ronhu/projects/soc-local/SOC-Team-D/data/exports/full_assets_df.csv)
+    - [`full_asset_covariance_df.csv`](C:/Users/ronhu/projects/soc-local/SOC-Team-D/data/exports/full_asset_covariance_df.csv)
 4.  `build_constraint_summary()` converts the selected band into:
     - per-asset cap
     - class minima
@@ -393,7 +391,7 @@ Examples:
 
 Current repo coverage:
 
-- `tests/test_services_submission.py`
+- [`test_services_submission.py`](C:/Users/ronhu/projects/soc-local/SOC-Team-D/tests/test_services_submission.py)
 
 ### 2. Policy integrity tests
 
@@ -409,7 +407,7 @@ Examples:
 
 Current repo coverage:
 
-- `tests/test_portfolio_variant_b.py`
+- [`test_portfolio_variant_b.py`](C:/Users/ronhu/projects/soc-local/SOC-Team-D/tests/test_portfolio_variant_b.py)
 
 ### 3. Feasibility tests
 

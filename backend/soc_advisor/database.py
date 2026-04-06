@@ -1,4 +1,15 @@
-"""SQLAlchemy database setup for the SOC advisor backend."""
+"""SQLAlchemy session setup for the SOC advisor backend.
+
+This file is intentionally small.
+
+It owns:
+
+- engine creation
+- the ORM base class
+- one request-scoped database-session helper
+
+It does not own application rules or portfolio logic.
+"""
 
 from __future__ import annotations
 

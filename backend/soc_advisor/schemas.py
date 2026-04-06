@@ -1,10 +1,26 @@
-"""Pydantic schemas for request and response payloads."""
+"""Pydantic schemas for the advisor API and Chainlit experiment.
+
+This file defines the wire-format contracts shared between:
+
+- the FastAPI routes
+- the service layer
+- the Chainlit UI helpers
+
+It does not contain business logic. If you are trying to understand *how* a
+profile or recommendation is produced, move next to `services.py` or
+`portfolio.py`.
+"""
 
 from __future__ import annotations
 
 from datetime import datetime
 
 from pydantic import BaseModel, Field
+
+
+#
+# Questionnaire definition models
+#
 
 
 class QuestionOption(BaseModel):
@@ -18,6 +34,12 @@ class QuestionDependency(BaseModel):
     option_ids: list[str]
 
 
+class QuestionValidation(BaseModel):
+    min_value: float | None = None
+    max_value: float | None = None
+    example: str | None = None
+
+
 class QuestionDefinition(BaseModel):
     id: str
     order: int
@@ -26,8 +48,10 @@ class QuestionDefinition(BaseModel):
     type: str
     dimension: str
     required: bool = True
+    used_for_scoring: bool = True
     depends_on: QuestionDependency | None = None
-    options: list[QuestionOption]
+    validation: QuestionValidation | None = None
+    options: list[QuestionOption] = Field(default_factory=list)
 
 
 class QuestionnaireResponse(BaseModel):
@@ -35,6 +59,11 @@ class QuestionnaireResponse(BaseModel):
     title: str
     description: str
     questions: list[QuestionDefinition]
+
+
+#
+# Session and answer models
+#
 
 
 class CreateSessionRequest(BaseModel):
@@ -50,15 +79,17 @@ class CreateSessionResponse(BaseModel):
 
 
 class AnswerUpsertRequest(BaseModel):
-    question_id: str = Field(..., examples=["portfolio_purpose"])
-    option_id: str = Field(..., examples=["wealth_building"])
+    question_id: str = Field(..., examples=["financial_knowledge"])
+    option_id: str | None = Field(default=None, examples=["wealth_building"])
+    numeric_value: float | None = Field(default=None, examples=[25000])
 
 
 class AnswerSummary(BaseModel):
     question_id: str
     question_text: str
     dimension: str
-    option_id: str
+    answer_type: str
+    option_id: str | None = None
     answer_label: str
 
 
@@ -73,6 +104,11 @@ class SessionStateResponse(BaseModel):
     answers: list[AnswerSummary]
     missing_question_ids: list[str]
     can_submit: bool
+
+
+#
+# Profile and recommendation models
+#
 
 
 class ProfileSummary(BaseModel):
@@ -128,6 +164,11 @@ class RecommendationSummary(BaseModel):
     metrics: PortfolioMetrics
     constraints: ConstraintSummary
     notes: list[str]
+
+
+#
+# Submit/result wrapper models
+#
 
 
 class SubmitSessionRequest(BaseModel):

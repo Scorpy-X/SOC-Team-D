@@ -1,0 +1,316 @@
+{
+  "version": "v3",
+  "title": "Risk Profiling Questionnaire",
+  "description": "Typed questionnaire with numeric open-entry liquidity inputs and single-choice risk questions. The numeric amount inputs are captured and reviewable, but they are not yet used in the active allocation path.",
+  "questions": [
+    {
+      "id": "portfolio_value",
+      "order": 1,
+      "text": "What is your portfolio value? Please enter the dollar amount you will be investing today. The minimum portfolio value for this questionnaire is $25,000.",
+      "help_text": "Enter a dollar amount at or above $25,000. You can include a dollar sign and commas, for example: $50,000.",
+      "type": "currency_amount",
+      "dimension": "portfolio_value",
+      "required": true,
+      "used_for_scoring": false,
+      "validation": {
+        "min_value": 25000,
+        "example": "$50,000"
+      },
+      "options": []
+    },
+    {
+      "id": "major_expense_withdrawal_amount",
+      "order": 2,
+      "text": "What is the dollar amount of any major expense you anticipate needing to withdraw over the next 12 to 24 months?",
+      "help_text": "This captures known near-term withdrawal pressure from house, education, or lifestyle expenses.",
+      "type": "currency_amount",
+      "dimension": "major_expense_withdrawal_amount",
+      "required": true,
+      "used_for_scoring": false,
+      "validation": {
+        "min_value": 0,
+        "example": "$10,000"
+      },
+      "options": []
+    },
+    {
+      "id": "essential_monthly_expenses",
+      "order": 3,
+      "text": "What is the dollar amount of your essential monthly expenses?",
+      "help_text": "This supports the liquidity-need reference calculation, but it is not yet used in the active allocation path.",
+      "type": "currency_amount",
+      "dimension": "essential_monthly_expenses",
+      "required": true,
+      "used_for_scoring": false,
+      "validation": {
+        "min_value": 0,
+        "example": "$2,500"
+      },
+      "options": []
+    },
+    {
+      "id": "emergency_fund_months",
+      "order": 4,
+      "text": "How many months of expenses would you like to have set aside for emergencies?",
+      "help_text": "This is one of the liquidity-capacity signals from the questionnaire.",
+      "type": "single_choice",
+      "dimension": "emergency_fund_months",
+      "required": true,
+      "options": [
+        {
+          "id": "months_0",
+          "label": "0 months",
+          "description": "No separate emergency reserve target."
+        },
+        {
+          "id": "months_1_3",
+          "label": "1-3 months",
+          "description": "Small emergency reserve target."
+        },
+        {
+          "id": "months_4_6",
+          "label": "4-6 months",
+          "description": "Moderate emergency reserve target."
+        },
+        {
+          "id": "months_6_plus",
+          "label": "More than 6 months",
+          "description": "Large emergency reserve target."
+        }
+      ]
+    },
+    {
+      "id": "non_investment_income_stability",
+      "order": 5,
+      "text": "How would you describe your non-investment income?",
+      "help_text": "This remains a single-choice stability signal in the current typed questionnaire.",
+      "type": "single_choice",
+      "dimension": "non_investment_income_stability",
+      "required": true,
+      "options": [
+        {
+          "id": "very_stable",
+          "label": "Very stable",
+          "description": "Stable job, high surplus (1.0x)."
+        },
+        {
+          "id": "moderately_stable",
+          "label": "Moderately stable",
+          "description": "Standard employment (1.25x)."
+        },
+        {
+          "id": "unstable",
+          "label": "Unstable",
+          "description": "Variable income or commission based (1.5x)."
+        }
+      ]
+    },
+    {
+      "id": "time_horizon",
+      "order": 6,
+      "text": "What is your time horizon? When do you anticipate needing to withdraw the first major sum from your investment?",
+      "help_text": "This is a risk-capacity question and can override pure tolerance signals later.",
+      "type": "single_choice",
+      "dimension": "time_horizon",
+      "required": true,
+      "options": [
+        {
+          "id": "years_5_or_less",
+          "label": "5 years or less",
+          "description": "Short horizon (cap stocks at 20%)."
+        },
+        {
+          "id": "years_6_to_9",
+          "label": "6 to 9 years",
+          "description": "Medium horizon (cap stocks at 50%)."
+        },
+        {
+          "id": "years_10_plus",
+          "label": "10 years or more",
+          "description": "Long horizon (no stock cap in the reference wording)."
+        }
+      ]
+    },
+    {
+      "id": "investment_phase",
+      "order": 7,
+      "text": "What phase of your investment life would you say you are in?",
+      "help_text": "This is still a single-choice phase signal in the current implementation.",
+      "type": "single_choice",
+      "dimension": "investment_phase",
+      "required": true,
+      "options": [
+        {
+          "id": "accumulation",
+          "label": "Capital accumulation",
+          "description": "The portfolio is still mainly for growth."
+        },
+        {
+          "id": "disbursement",
+          "label": "Capital disbursement",
+          "description": "The portfolio is being used more directly for withdrawals."
+        }
+      ]
+    },
+    {
+      "id": "market_drop_response",
+      "order": 8,
+      "text": "If the stock market dropped 25% tomorrow and stayed there for two years, what would you do?",
+      "help_text": "This captures one concrete loss-response scenario using the new question set.",
+      "type": "single_choice",
+      "dimension": "market_drop_response",
+      "required": true,
+      "options": [
+        {
+          "id": "sell_everything",
+          "label": "Sell everything to protect what is left",
+          "description": "Exit the position after a major drop."
+        },
+        {
+          "id": "sell_portion",
+          "label": "Sell a portion and move to a safer investment",
+          "description": "Reduce exposure after the drop."
+        },
+        {
+          "id": "invest_more",
+          "label": "Invest more money to take advantage of lower prices",
+          "description": "Add capital after the drop."
+        }
+      ]
+    },
+    {
+      "id": "short_term_loss_willingness",
+      "order": 9,
+      "text": "How willing are you to accept short-term losses for potential long-term gain?",
+      "help_text": "This is the direct loss-tolerance willingness question from the new set.",
+      "type": "single_choice",
+      "dimension": "short_term_loss_willingness",
+      "required": true,
+      "options": [
+        {
+          "id": "very_willing",
+          "label": "Very willing",
+          "description": "Very comfortable with short-term losses."
+        },
+        {
+          "id": "willing",
+          "label": "Willing",
+          "description": "Comfortable with some losses for long-term gain."
+        },
+        {
+          "id": "indifferent",
+          "label": "Indifferent",
+          "description": "Neutral on short-term losses versus long-term gain."
+        },
+        {
+          "id": "unwilling",
+          "label": "Unwilling",
+          "description": "Prefers to avoid short-term losses."
+        },
+        {
+          "id": "very_unwilling",
+          "label": "Very unwilling",
+          "description": "Strongly prefers to avoid short-term losses."
+        }
+      ]
+    },
+    {
+      "id": "financial_knowledge",
+      "order": 10,
+      "text": "How knowledgeable are you about financial and investment concepts?",
+      "help_text": "This remains a direct self-reported knowledge question.",
+      "type": "single_choice",
+      "dimension": "financial_knowledge",
+      "required": true,
+      "options": [
+        {
+          "id": "not_knowledgeable",
+          "label": "Not at all knowledgeable",
+          "description": "Very limited familiarity with finance and investing."
+        },
+        {
+          "id": "minimally_knowledgeable",
+          "label": "Minimally knowledgeable",
+          "description": "Some familiarity, but still limited."
+        },
+        {
+          "id": "moderately_knowledgeable",
+          "label": "Moderately knowledgeable",
+          "description": "Comfortable with common investing ideas."
+        },
+        {
+          "id": "competent",
+          "label": "Competent",
+          "description": "Strong practical understanding."
+        },
+        {
+          "id": "very_knowledgeable",
+          "label": "Very knowledgeable",
+          "description": "Very comfortable with financial concepts."
+        }
+      ]
+    },
+    {
+      "id": "investing_experience_length",
+      "order": 11,
+      "text": "How long have you been investing?",
+      "help_text": "This keeps the experience question as a simple time bucket.",
+      "type": "single_choice",
+      "dimension": "investing_experience_length",
+      "required": true,
+      "options": [
+        {
+          "id": "lt_1_year",
+          "label": "Less than a year",
+          "description": "Very limited investing experience."
+        },
+        {
+          "id": "years_1_3",
+          "label": "1-3 years",
+          "description": "Early hands-on investing experience."
+        },
+        {
+          "id": "years_4_10",
+          "label": "4-10 years",
+          "description": "Moderate investing experience."
+        },
+        {
+          "id": "years_10_plus",
+          "label": "More than 10 years",
+          "description": "Long investing history."
+        }
+      ]
+    },
+    {
+      "id": "past_loss_action",
+      "order": 12,
+      "text": "In the past, when faced with investment losses, what action did you take?",
+      "help_text": "This is the historical behavior question from the new risk-tolerance section.",
+      "type": "single_choice",
+      "dimension": "past_loss_action",
+      "required": true,
+      "options": [
+        {
+          "id": "sold_out",
+          "label": "Sold out",
+          "description": "Exited the position after losses."
+        },
+        {
+          "id": "sold_some",
+          "label": "Sold some",
+          "description": "Reduced exposure after losses."
+        },
+        {
+          "id": "did_nothing",
+          "label": "Did nothing",
+          "description": "Stayed invested without changing position."
+        },
+        {
+          "id": "purchased_more",
+          "label": "Purchased more",
+          "description": "Added to the investment after prices fell."
+        }
+      ]
+    }
+  ]
+}

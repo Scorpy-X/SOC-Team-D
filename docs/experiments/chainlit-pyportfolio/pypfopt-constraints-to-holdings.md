@@ -1,8 +1,5 @@
 # How PyPortfolioOpt Turns Constraints Into Holdings
 
-This note describes the allocation step used in the current Week 3 integrated
-prototype in `SOC Team D`.
-
 This note answers one question:
 
 **once we define the active Variant B band ranges, how does `PyPortfolioOpt`

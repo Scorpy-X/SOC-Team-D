@@ -1,29 +1,23 @@
-# SOC Team D Week 4 Submission Repository
+# SOC Team D Week 3 Submission Repository
 
-This is the Week 4 submission snapshot for SOC Team D.
+This is the Week 3 submission snapshot for SOC Team D.
 
-The repo still presents the integrated Chainlit advisor prototype first, but
-the Week 4 snapshot now includes the main runtime and input upgrades completed
-after the Week 3 submission:
+The repo now presents the current integrated prototype first:
 
-- typed `v3` questionnaire inputs
-- numeric amount capture with explicit confirmation
-- scoring fallback aligned to `v4`
-- live SOC API first, CSV fallback in the allocator
-- clearer architecture and explainability documentation
-- stronger automated test coverage
+`questionnaire -> review/edit -> manual mock band selection -> Variant B allocation -> holdings`
 
-The older Week 3 and Week 2 stories are preserved as historical material. They
-are no longer the main repo identity.
+The older frontend-only Week 2 story is still preserved in
+[`docs/submission/`](docs/submission/) and
+[`docs/submission/archive/`](docs/submission/archive/), but it is no longer the
+main repo identity.
 
 ## Start Here
 
-- Week 4 summary: [`docs/submission/week-4-summary.md`](docs/submission/week-4-summary.md)
-- Week 4 snapshot note: [`docs/submission/chainlit-prototype-snapshot.md`](docs/submission/chainlit-prototype-snapshot.md)
+- Week 3 summary: [`docs/submission/week-3-summary.md`](docs/submission/week-3-summary.md)
+- Snapshot note: [`docs/submission/chainlit-prototype-snapshot.md`](docs/submission/chainlit-prototype-snapshot.md)
 - Prototype docs: [`docs/experiments/chainlit-pyportfolio/README.md`](docs/experiments/chainlit-pyportfolio/README.md)
-- Historical Week 3 summary: [`docs/submission/archive/team-d-week3-summary.md`](docs/submission/archive/team-d-week3-summary.md)
-- Historical Week 3 README snapshot: [`docs/submission/archive/team-d-readme-week3.md`](docs/submission/archive/team-d-readme-week3.md)
 - Historical Week 2 summary: [`docs/submission/week-2-summary.md`](docs/submission/week-2-summary.md)
+- Historical Week 2 README snapshot: [`docs/submission/archive/team-d-readme-week2.md`](docs/submission/archive/team-d-readme-week2.md)
 
 ## Primary Run Path
 
@@ -31,33 +25,33 @@ are no longer the main repo identity.
 2. Double-click [`Run Chainlit Experiment.cmd`](Run%20Chainlit%20Experiment.cmd)
 3. Open `http://localhost:8010` if the browser does not open by itself
 
-This is the primary Week 4 prototype path.
+This is the primary Week 3 prototype path.
 
-## What This Week 4 Submission Shows
+## What This Week 3 Submission Shows
 
 - a runnable Chainlit investor-advisor prototype in `experiments/chainlit_chat/`
 - an exploratory backend allocator in `backend/soc_advisor/`
 - a reusable SOC API package in `backend/soc_api/`
 - the active questionnaire, scoring fallback, and Variant B policy configs in `config/`
-- test coverage for typed answers, submission behavior, question flow, and portfolio feasibility in `tests/`
+- test coverage for submission and allocation behavior in `tests/`
 - preserved frontend, notebook, and export evidence from the earlier repo story
 
 ## Current Active Prototype Flow
 
-1. The chat asks the typed `v3` questionnaire.
-2. Single-choice answers are saved immediately.
-3. Numeric amount answers are parsed, normalized, and explicitly confirmed before save.
-4. The user reviews numbered answers and can edit with `change <question number>`.
-5. The user chooses a draft investor band with `band <band number>`.
-6. The backend applies the Variant B class ranges from `config/portfolio/v2.json`.
-7. `PyPortfolioOpt` selects exact holdings inside those band ranges using expected returns and covariance, with live SOC data preferred and CSV snapshots as fallback.
+1. The chat asks the current DOCX-aligned single-choice questionnaire.
+2. Each answer is saved immediately in the backend session store.
+3. The user reviews numbered answers and can edit with `change <question number>`.
+4. The user chooses a draft investor band with `band <band number>`.
+5. The backend applies the Variant B class ranges from `config/portfolio/v2.json`.
+6. `PyPortfolioOpt` selects exact holdings inside those band ranges using
+   expected returns and covariance from the local snapshot data.
 
 ## Important Current Limits
 
-- the current Week 4 prototype still uses **manual mock band selection**
+- the current Week 3 prototype still uses **manual mock band selection**
 - question-to-band scoring is **not** the primary demo path yet
-- numeric amount inputs are captured and reviewable, but they do **not yet** drive allocation
-- narrative free-text questions are still deferred
+- numeric and free-text DOCX questions are still deferred
+- the portfolio engine uses local CSV snapshots rather than live runtime API pulls
 - covariance PSD repair is applied before optimization
 - expected returns are model inputs, not guarantees
 
@@ -67,7 +61,7 @@ This is the primary Week 4 prototype path.
   - full developer setup
   - installs Python requirements, Chainlit extras, notebook tooling, and frontend dependencies
 - [`Run Chainlit Experiment.cmd`](Run%20Chainlit%20Experiment.cmd)
-  - primary Week 4 prototype launcher
+  - primary Week 3 prototype launcher
 - [`Run API.cmd`](Run%20API.cmd)
   - launches the exploratory backend API and opens FastAPI docs
 - [`Setup Demo.cmd`](Setup%20Demo.cmd)
@@ -82,13 +76,13 @@ This is the primary Week 4 prototype path.
 - `backend/soc_api/`
   - reusable SOC API/dataframe package
 - `config/`
-  - questionnaire `v3`, scoring fallback `v4`, portfolio policy `v2`
+  - questionnaire `v2`, scoring fallback `v3`, portfolio policy `v2`
 - `experiments/chainlit_chat/`
-  - chat application for the Week 4 prototype
+  - chat application for the Week 3 prototype
 - `docs/experiments/chainlit-pyportfolio/`
-  - defense, architecture, methodology, questionnaire, and runtime notes for the promoted prototype
+  - defense, methodology, flow, and policy notes for the promoted prototype
 - `tests/`
-  - current automated coverage for typed answers, formatting, submission, and allocation behavior
+  - current automated coverage for submission, formatting, and Variant B behavior
 - `frontend/`
   - preserved secondary demo surface
 - `notebooks/`
@@ -99,7 +93,7 @@ This is the primary Week 4 prototype path.
 ## Secondary Frontend Path
 
 The React frontend is still present and still useful as evidence and demo
-material, but it is not the first recommended repo story for Week 4.
+material, but it is no longer the first recommended repo story for Week 3.
 
 If you only want the frontend demo:
 
@@ -109,12 +103,10 @@ If you only want the frontend demo:
 
 ## Historical Submission Material
 
-Older material remains in the repo on purpose.
+Week 2 material remains in the repo on purpose.
 
 Use these when you need the earlier submission framing:
 
-- [`docs/submission/archive/team-d-week3-summary.md`](docs/submission/archive/team-d-week3-summary.md)
-- [`docs/submission/archive/team-d-week3-chainlit-snapshot.md`](docs/submission/archive/team-d-week3-chainlit-snapshot.md)
 - [`docs/submission/week-2-summary.md`](docs/submission/week-2-summary.md)
 - [`docs/submission/Investor Questionnaire Draft - Week 2.pdf`](docs/submission/Investor%20Questionnaire%20Draft%20-%20Week%202.pdf)
 - [`docs/submission/archive/team-d-readme-week2.md`](docs/submission/archive/team-d-readme-week2.md)

@@ -1,4 +1,15 @@
-"""Application settings for the SOC advisor backend."""
+"""Resolved settings for the SOC advisor backend.
+
+This is the central place for:
+
+- default questionnaire/scoring/portfolio versions
+- filesystem paths
+- database URL resolution
+- CORS settings
+
+Keeping this separate makes the active runtime configuration easy to inspect
+without reading the business-logic modules first.
+"""
 
 from __future__ import annotations
 
@@ -14,8 +25,8 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_DATABASE_PATH = ROOT_DIR / "data" / "soc_advisor.db"
 DEFAULT_DATABASE_URL = f"sqlite:///{DEFAULT_DATABASE_PATH.as_posix()}"
 DATABASE_ENV_KEYS = ("SOC_ADVISOR_DATABASE_URL", "DATABASE_URL")
-DEFAULT_QUESTIONNAIRE_VERSION = "v2"
-DEFAULT_SCORING_VERSION = "v3"
+DEFAULT_QUESTIONNAIRE_VERSION = "v3"
+DEFAULT_SCORING_VERSION = "v4"
 DEFAULT_PORTFOLIO_VERSION = "v2"
 
 

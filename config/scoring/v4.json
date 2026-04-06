@@ -1,0 +1,149 @@
+{
+  "version": "v4",
+  "name": "Typed questionnaire fallback scoring for questionnaire v3",
+  "question_scores": {
+    "emergency_fund_months": {
+      "months_0": 0,
+      "months_1_3": 1,
+      "months_4_6": 2,
+      "months_6_plus": 3
+    },
+    "non_investment_income_stability": {
+      "very_stable": 2,
+      "moderately_stable": 1,
+      "unstable": 0
+    },
+    "time_horizon": {
+      "years_5_or_less": 0,
+      "years_6_to_9": 1,
+      "years_10_plus": 2
+    },
+    "investment_phase": {
+      "accumulation": 1,
+      "disbursement": 0
+    },
+    "market_drop_response": {
+      "sell_everything": 0,
+      "sell_portion": 1,
+      "invest_more": 3
+    },
+    "short_term_loss_willingness": {
+      "very_willing": 4,
+      "willing": 3,
+      "indifferent": 2,
+      "unwilling": 1,
+      "very_unwilling": 0
+    },
+    "financial_knowledge": {
+      "not_knowledgeable": 0,
+      "minimally_knowledgeable": 1,
+      "moderately_knowledgeable": 2,
+      "competent": 3,
+      "very_knowledgeable": 4
+    },
+    "investing_experience_length": {
+      "lt_1_year": 0,
+      "years_1_3": 1,
+      "years_4_10": 2,
+      "years_10_plus": 3
+    },
+    "past_loss_action": {
+      "sold_out": 0,
+      "sold_some": 1,
+      "did_nothing": 2,
+      "purchased_more": 4
+    }
+  },
+  "profile_bands": [
+    {
+      "id": "very_conservative",
+      "label": "Very Conservative",
+      "min_score": 0,
+      "max_score": 5,
+      "description": "The fallback score points strongly toward preserving capital, limiting volatility, and keeping a large stability anchor."
+    },
+    {
+      "id": "conservative",
+      "label": "Conservative",
+      "min_score": 6,
+      "max_score": 10,
+      "description": "The fallback score supports a cautious allocation with meaningful stability and a limited growth sleeve."
+    },
+    {
+      "id": "balanced",
+      "label": "Balanced",
+      "min_score": 11,
+      "max_score": 16,
+      "description": "The fallback score supports a mixed allocation that balances stability and growth."
+    },
+    {
+      "id": "growth",
+      "label": "Growth",
+      "min_score": 17,
+      "max_score": 21,
+      "description": "The fallback score supports a growth-oriented allocation with a clear equity majority."
+    },
+    {
+      "id": "aggressive",
+      "label": "Aggressive",
+      "min_score": 22,
+      "max_score": 26,
+      "description": "The fallback score supports a strongly growth-oriented allocation with only a small stability allocation."
+    }
+  ],
+  "reason_rules": [
+    {
+      "question_id": "time_horizon",
+      "option_ids": [
+        "years_10_plus"
+      ],
+      "text": "A longer time horizon generally supports greater risk capacity in the fallback path."
+    },
+    {
+      "question_id": "time_horizon",
+      "option_ids": [
+        "years_5_or_less"
+      ],
+      "text": "A shorter time horizon generally pushes the fallback path toward more stability."
+    },
+    {
+      "question_id": "non_investment_income_stability",
+      "option_ids": [
+        "unstable"
+      ],
+      "text": "Less stable non-investment income suggests lower room to absorb portfolio volatility."
+    },
+    {
+      "question_id": "short_term_loss_willingness",
+      "option_ids": [
+        "very_willing",
+        "willing"
+      ],
+      "text": "Your stated willingness to accept short-term losses supports a more growth-oriented fallback profile."
+    },
+    {
+      "question_id": "short_term_loss_willingness",
+      "option_ids": [
+        "unwilling",
+        "very_unwilling"
+      ],
+      "text": "Your stated unwillingness to accept short-term losses supports a more cautious fallback profile."
+    },
+    {
+      "question_id": "market_drop_response",
+      "option_ids": [
+        "sell_everything",
+        "sell_portion"
+      ],
+      "text": "Your response to a large market drop suggests lower comfort with drawdowns."
+    },
+    {
+      "question_id": "past_loss_action",
+      "option_ids": [
+        "did_nothing",
+        "purchased_more"
+      ],
+      "text": "Your past behavior during losses suggests you may stay more disciplined during volatility."
+    }
+  ]
+}

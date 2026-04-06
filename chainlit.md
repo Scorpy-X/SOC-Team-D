@@ -1,4 +1,4 @@
-# SOC Chainlit Week 3 Prototype
+# SOC Chainlit Experiment
 
 The detailed experiment documentation now lives in:
 
@@ -7,7 +7,7 @@ The detailed experiment documentation now lives in:
 Use that folder for:
 
 - the chat flow explanation
-- the defense story
-- the allocation-methodology note
-- the policy matrix
-- the worked examples
+- the portfolio-constraint guide
+- the data-usage guide
+- the math appendix
+- the teammate handoff notes

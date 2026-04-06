@@ -1,7 +1,5 @@
 # Portfolio Policy Matrix
 
-This note describes the active Week 3 Variant B policy in `SOC Team D`.
-
 This note explains the current active Variant B policy in plain English.
 
 Source of truth:

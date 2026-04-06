@@ -1,7 +1,5 @@
 # How To Explain The Current System
 
-This note describes the current Week 3 integrated prototype in `SOC Team D`.
-
 This is the shortest accurate story for the current active demo.
 
 ## One-sentence version
@@ -74,8 +72,9 @@ Those statements are not true for the current active path.
 
 - the chat demo still uses manual mock band selection
 - the old scoring config is retained only as a backend fallback
-- numeric and free-text items from the DOCX are not implemented in the chat yet
-- the engine still uses local CSV snapshots, not live API pulls
+- numeric amount inputs from the DOCX are captured, but they do not yet drive allocation
+- narrative free-text items are still not implemented in the chat
+- the engine now tries live SOC API data first and falls back to local CSV snapshots
 - the covariance matrix still needs in-memory PSD repair before optimization
 
 ## Short reference

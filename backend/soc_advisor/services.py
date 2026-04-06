@@ -1,11 +1,11 @@
 """Core service helpers for questionnaire loading, validation, and scoring.
 
-Think of this module as the business-logic layer for the assessment flow.
+This module is the business-logic layer for the advisor flow.
 
 It sits between:
 
 - the UI/API entrypoints
-- the database
+- the database models
 - the portfolio engine
 
 Responsibilities:
@@ -13,13 +13,14 @@ Responsibilities:
 - load questionnaire and scoring configs
 - validate submitted answers
 - track which questions are still missing
-- score completed questionnaires into a profile band
+- choose a profile through either the manual-band path or the scored fallback
 - pass the finished profile to the portfolio engine
 """
 
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from functools import lru_cache
 from typing import Any
 from uuid import uuid4
@@ -36,11 +37,17 @@ from .schemas import (
     SessionStateResponse,
 )
 from .settings import get_settings
+from .typed_answers import normalize_currency_amount
 
 
 settings = get_settings()
 MANUAL_MOCK_PROFILE_SOURCE = "manual_mock_band"
 SCORED_QUESTIONNAIRE_PROFILE_SOURCE = "scored_questionnaire"
+
+
+# ---------------------------------------------------------------------------
+# Config loading
+# ---------------------------------------------------------------------------
 
 
 @lru_cache(maxsize=8)
@@ -67,6 +74,11 @@ def load_scoring(version: str) -> dict[str, Any]:
             detail=f"Scoring version '{version}' was not found.",
         )
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+# ---------------------------------------------------------------------------
+# Questionnaire lookups and validation
+# ---------------------------------------------------------------------------
 
 
 def _question_lookup(questionnaire: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -112,6 +124,128 @@ def ensure_valid_answer(
     return question, option
 
 
+def _question_type(question: dict[str, Any]) -> str:
+    """Return the configured question type, defaulting old configs safely."""
+
+    return str(question.get("type", "single_choice"))
+
+
+def _resolve_submitted_answer(
+    questionnaire: dict[str, Any],
+    *,
+    question_id: str,
+    option_id: str | None,
+    numeric_value: float | None,
+) -> tuple[dict[str, Any], str | None, str, str, str]:
+    """Validate one submitted answer and return the persisted answer payload.
+
+    Returns:
+
+    - question definition
+    - option id if this is a single-choice answer
+    - raw value snapshot
+    - normalized value snapshot
+    - human-readable answer label snapshot
+    """
+
+    question = _question_lookup(questionnaire).get(question_id)
+    if question is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown question_id '{question_id}'.",
+        )
+
+    question_type = _question_type(question)
+    if question_type == "single_choice":
+        if option_id is None or numeric_value is not None:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Question '{question_id}' expects an option_id and does not accept numeric_value."
+                ),
+            )
+
+        _, option = ensure_valid_answer(
+            questionnaire,
+            question_id=question_id,
+            option_id=option_id,
+        )
+        return (
+            question,
+            option["id"],
+            option["label"],
+            option["id"],
+            option["label"],
+        )
+
+    if question_type == "currency_amount":
+        if option_id is not None or numeric_value is None:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Question '{question_id}' expects numeric_value and does not accept option_id."
+                ),
+            )
+
+        try:
+            normalized_value, _, display_value = normalize_currency_amount(
+                numeric_value,
+                question_id=question_id,
+                validation=question.get("validation"),
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+        return (
+            question,
+            None,
+            display_value,
+            normalized_value,
+            display_value,
+        )
+
+    raise HTTPException(
+        status_code=500,
+        detail=f"Unsupported question type '{question_type}' for question '{question_id}'.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Answer lookup helpers
+# ---------------------------------------------------------------------------
+
+
+def _normalized_answer_value(answer: Any) -> str | None:
+    """Extract one normalized answer id from several lightweight answer shapes.
+
+    Why this helper exists:
+
+    - the database layer uses ``AssessmentAnswer.normalized_value``
+    - API summaries use ``AnswerSummary.option_id``
+    - the chat flow only needs plain ``question_id -> option_id`` lookups
+
+    Normalizing those cases here keeps the rest of the dependency logic simple
+    and removes the need for placeholder wrapper objects in the chat layer.
+    """
+
+    if answer is None:
+        return None
+    if isinstance(answer, str):
+        return answer
+    if isinstance(answer, Mapping):
+        for key in ("normalized_value", "option_id"):
+            value = answer.get(key)
+            if isinstance(value, str):
+                return value
+
+    for attribute in ("normalized_value", "option_id"):
+        value = getattr(answer, attribute, None)
+        if isinstance(value, str):
+            return value
+
+    return None
+
+
 def answers_by_question(session: AssessmentSession) -> dict[str, AssessmentAnswer]:
     """Return ORM answers keyed by question id."""
 
@@ -120,7 +254,7 @@ def answers_by_question(session: AssessmentSession) -> dict[str, AssessmentAnswe
 
 def is_question_active(
     question: dict[str, Any],
-    answers_lookup: dict[str, AssessmentAnswer],
+    answers_lookup: Mapping[str, Any],
 ) -> bool:
     """Evaluate a simple dependency rule if the question has one."""
 
@@ -128,11 +262,11 @@ def is_question_active(
     if not depends_on:
         return True
 
-    parent_answer = answers_lookup.get(depends_on["question_id"])
-    if parent_answer is None:
+    parent_value = _normalized_answer_value(answers_lookup.get(depends_on["question_id"]))
+    if parent_value is None:
         return False
 
-    return parent_answer.normalized_value in depends_on["option_ids"]
+    return parent_value in depends_on["option_ids"]
 
 
 def get_missing_question_ids(
@@ -164,13 +298,21 @@ def build_answer_summaries(
     order_map = {
         question["id"]: question["order"] for question in questionnaire["questions"]
     }
+    type_map = {
+        question["id"]: _question_type(question) for question in questionnaire["questions"]
+    }
 
     return [
         AnswerSummary(
             question_id=answer.question_id,
             question_text=answer.question_text_snapshot,
             dimension=answer.dimension_snapshot,
-            option_id=answer.normalized_value,
+            answer_type=type_map.get(answer.question_id, "single_choice"),
+            option_id=(
+                answer.normalized_value
+                if type_map.get(answer.question_id, "single_choice") == "single_choice"
+                else None
+            ),
             answer_label=answer.answer_label_snapshot,
         )
         for answer in sorted(
@@ -178,6 +320,11 @@ def build_answer_summaries(
             key=lambda item: order_map.get(item.question_id, 999),
         )
     ]
+
+
+# ---------------------------------------------------------------------------
+# Session persistence
+# ---------------------------------------------------------------------------
 
 
 def create_assessment_session(
@@ -212,14 +359,16 @@ def upsert_answer(
     session: AssessmentSession,
     questionnaire: dict[str, Any],
     question_id: str,
-    option_id: str,
+    option_id: str | None = None,
+    numeric_value: float | None = None,
 ) -> AssessmentSession:
     """Insert or update one answer inside a session."""
 
-    question, option = ensure_valid_answer(
+    question, _resolved_option_id, raw_value, normalized_value, answer_label = _resolve_submitted_answer(
         questionnaire,
         question_id=question_id,
         option_id=option_id,
+        numeric_value=numeric_value,
     )
 
     existing_answer = next(
@@ -233,19 +382,21 @@ def upsert_answer(
                 question_id=question_id,
                 dimension_snapshot=question["dimension"],
                 question_text_snapshot=question["text"],
-                raw_value=option["label"],
-                normalized_value=option["id"],
-                answer_label_snapshot=option["label"],
+                raw_value=raw_value,
+                normalized_value=normalized_value,
+                answer_label_snapshot=answer_label,
             )
         )
     else:
         existing_answer.dimension_snapshot = question["dimension"]
         existing_answer.question_text_snapshot = question["text"]
-        existing_answer.raw_value = option["label"]
-        existing_answer.normalized_value = option["id"]
-        existing_answer.answer_label_snapshot = option["label"]
+        existing_answer.raw_value = raw_value
+        existing_answer.normalized_value = normalized_value
+        existing_answer.answer_label_snapshot = answer_label
         existing_answer.updated_at = utc_now()
 
+    # Any answer change invalidates the previous submitted result so the next
+    # submit starts from the refreshed questionnaire state.
     session.status = "draft"
     session.profile_band = None
     session.profile_score = None
@@ -291,6 +442,11 @@ def build_session_state(
         missing_question_ids=missing_question_ids,
         can_submit=not missing_question_ids,
     )
+
+
+# ---------------------------------------------------------------------------
+# Profile selection and scoring
+# ---------------------------------------------------------------------------
 
 
 def _ensure_session_complete(
@@ -364,6 +520,8 @@ def score_session(
     for question in questionnaire["questions"]:
         if not is_question_active(question, answers_lookup):
             continue
+        if not question.get("used_for_scoring", True):
+            continue
 
         answer = answers_lookup[question["id"]]
         score_map = scoring["question_scores"].get(question["id"])
@@ -384,9 +542,9 @@ def score_session(
             )
 
         total_score += float(answer_score)
-        # Dimension scores are currently a lightweight record keyed by the
-        # question dimension. They are useful for debugging and explanation,
-        # even though this is not yet a richer weighted sub-score model.
+        # This is still a lightweight dimension record rather than a richer
+        # weighted sub-score model. It remains useful for debugging and future
+        # explanation work, so the compatibility path keeps it.
         dimension_scores[question["dimension"]] = float(answer_score)
 
     band = _band_for_score(scoring, total_score)
@@ -455,6 +613,37 @@ def build_manual_mock_profile(
             ),
         ],
     )
+
+
+def _select_profile_for_submission(
+    session: AssessmentSession,
+    questionnaire: dict[str, Any],
+    *,
+    mock_profile_band: str | None,
+) -> ProfileSummary:
+    """Choose the active profile path for one submission.
+
+    Active story:
+
+    - if the user chose a manual mock band, use the Variant B demo path
+
+    Compatibility story:
+
+    - if no manual band was supplied, fall back to the older scored path so the
+      backend can still support that route without the chat teaching it as the
+      primary flow
+    """
+
+    if mock_profile_band:
+        return build_manual_mock_profile(profile_band=mock_profile_band)
+
+    scoring = load_scoring(session.scoring_version)
+    return score_session(session, questionnaire, scoring)
+
+
+# ---------------------------------------------------------------------------
+# Result persistence and submit orchestration
+# ---------------------------------------------------------------------------
 
 
 def save_submission_result(
@@ -543,12 +732,11 @@ def submit_assessment(
     questionnaire = load_questionnaire(session.questionnaire_version)
     _ensure_session_complete(questionnaire, session)
 
-    if mock_profile_band:
-        profile = build_manual_mock_profile(profile_band=mock_profile_band)
-    else:
-        scoring = load_scoring(session.scoring_version)
-        profile = score_session(session, questionnaire, scoring)
-
+    profile = _select_profile_for_submission(
+        session,
+        questionnaire,
+        mock_profile_band=mock_profile_band,
+    )
     recommendation = build_recommendation(profile=profile)
     saved_session = save_submission_result(
         db,

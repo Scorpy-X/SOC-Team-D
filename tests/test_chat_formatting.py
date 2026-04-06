@@ -11,6 +11,8 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from soc_advisor.chat_formatting import (  # noqa: E402
+    format_edit_prompt,
+    format_question,
     render_profile_summary,
     render_review_message,
 )
@@ -27,11 +29,11 @@ from soc_advisor.schemas import (  # noqa: E402
 
 
 QUESTION_LABELS = {
-    "portfolio_purpose": "Purpose",
+    "portfolio_value": "Portfolio value",
     "financial_knowledge": "Knowledge",
 }
 QUESTIONS_BY_ID = {
-    "portfolio_purpose": {"text": "What is the main purpose of this portfolio?"},
+    "portfolio_value": {"text": "What is your portfolio value? Please enter the dollar amount you will be investing today. The minimum portfolio value for this questionnaire is $25,000."},
     "financial_knowledge": {"text": "How knowledgeable are you about financial and investment concepts?"},
 }
 
@@ -40,24 +42,26 @@ def _sample_state() -> SessionStateResponse:
     now = datetime.now(timezone.utc)
     return SessionStateResponse(
         session_id="session-1",
-        questionnaire_version="v2",
-        scoring_version="v3",
+        questionnaire_version="v3",
+        scoring_version="v4",
         status="draft",
         created_at=now,
         updated_at=now,
         submitted_at=None,
         answers=[
             AnswerSummary(
-                question_id="portfolio_purpose",
-                question_text=QUESTIONS_BY_ID["portfolio_purpose"]["text"],
-                dimension="portfolio_purpose",
-                option_id="wealth_building",
-                answer_label="To build long-term wealth",
+                question_id="portfolio_value",
+                question_text=QUESTIONS_BY_ID["portfolio_value"]["text"],
+                dimension="portfolio_value",
+                answer_type="currency_amount",
+                option_id=None,
+                answer_label="$50,000.00",
             ),
             AnswerSummary(
                 question_id="financial_knowledge",
                 question_text=QUESTIONS_BY_ID["financial_knowledge"]["text"],
                 dimension="financial_knowledge",
+                answer_type="single_choice",
                 option_id="very_knowledgeable",
                 answer_label="Very knowledgeable",
             ),
@@ -154,11 +158,35 @@ def test_render_review_message_numbers_answers_and_teaches_commands() -> None:
         selected_band_id="growth",
     )
 
-    assert "1. **Purpose:** To build long-term wealth" in text
+    assert "1. **Portfolio value:** $50,000.00" in text
     assert "2. **Knowledge:** Very knowledgeable" in text
     assert "`change <question number>`" in text
     assert "`band <band number>`" in text
     assert "Selected draft band:" in text
+
+
+def test_currency_amount_prompts_use_amount_specific_copy() -> None:
+    question = {
+        "id": "portfolio_value",
+        "order": 1,
+        "text": QUESTIONS_BY_ID["portfolio_value"]["text"],
+        "type": "currency_amount",
+        "help_text": "Enter a dollar amount at or above $25,000.",
+        "validation": {"example": "$50,000"},
+        "options": [],
+    }
+
+    prompt = format_question(question, total_questions=12, question_label="Portfolio value")
+    edit_prompt = format_edit_prompt(
+        question,
+        total_questions=12,
+        question_label="Portfolio value",
+        current_label="$50,000.00",
+    )
+
+    assert "Reply with a dollar amount." in prompt
+    assert "$50,000" in prompt
+    assert "Let's revise this amount." in edit_prompt
 
 
 def test_render_profile_summary_numbers_answers_in_final_output() -> None:
@@ -168,7 +196,7 @@ def test_render_profile_summary_numbers_answers_in_final_output() -> None:
         _sample_recommendation(),
     )
 
-    assert "1. **What is the main purpose of this portfolio?:** To build long-term wealth" in text
+    assert "1. **What is your portfolio value? Please enter the dollar amount you will be investing today. The minimum portfolio value for this questionnaire is $25,000.:** $50,000.00" in text
     assert "2. **How knowledgeable are you about financial and investment concepts?:** Very knowledgeable" in text
     assert "Score:** Not used in this mock-band run." in text
     assert "Band policy used" in text

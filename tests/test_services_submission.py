@@ -44,6 +44,7 @@ def test_submit_assessment_accepts_manual_mock_bands(
     assert profile.profile_score is None
     assert recommendation.profile_band == mock_profile_band
     assert any("manual" in note.lower() for note in recommendation.notes)
+    assert any("liquidity inputs" in note.lower() for note in recommendation.notes)
 
     saved_profile = get_saved_profile(saved_session)
     assert saved_profile.profile_source == "manual_mock_band"

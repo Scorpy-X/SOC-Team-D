@@ -1,7 +1,5 @@
 # Chainlit Chat Experiment
 
-This folder is part of the Week 3 integrated prototype in `SOC Team D`.
-
 This folder is an exploratory chat shell for the current Variant B investor
 workflow.
 

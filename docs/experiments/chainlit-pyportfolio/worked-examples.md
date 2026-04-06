@@ -1,8 +1,5 @@
 # Worked Examples
 
-These examples are part of the Week 3 integrated prototype snapshot in
-`SOC Team D`.
-
 These examples reflect the **current** Variant B manual-band path.
 
 They were generated from:

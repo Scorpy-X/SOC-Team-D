@@ -122,7 +122,7 @@ def install_python_requirements() -> None:
     run_command([str(venv_python), "-m", "pip", "install", "--upgrade", "pip"])
     install_requirements_file(venv_python, REQUIREMENTS_FILE)
     # Keep the experiment extras in their own file, but install them during
-    # the full developer bootstrap so the Week 3 prototype stays runnable.
+    # the full developer bootstrap so the Week 4 prototype stays runnable.
     install_requirements_file(venv_python, CHAINLIT_REQUIREMENTS_FILE)
     register_notebook_kernel(venv_python)
 
@@ -203,7 +203,7 @@ def print_next_steps(skip_python: bool, skip_frontend: bool) -> None:
         print("Use the notebook kernel named: Python 3.12 (SOC Team D)")
         print("If a live API notebook returns 403, recheck DIMENSION_DEPTHS_API_KEY in .env")
         if (ROOT_DIR / "Run Chainlit Experiment.cmd").exists():
-            print("Start the primary Week 3 prototype with: Run Chainlit Experiment.cmd")
+            print("Start the primary Week 4 prototype with: Run Chainlit Experiment.cmd")
         if (ROOT_DIR / "Run API.cmd").exists():
             print("Inspect the exploratory backend with: Run API.cmd")
 

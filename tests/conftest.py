@@ -47,11 +47,25 @@ def questionnaire() -> dict:
 def answered_session(db_session, questionnaire):
     session = create_assessment_session(db_session)
     for question in sorted(questionnaire["questions"], key=lambda item: item["order"]):
-        session = upsert_answer(
-            db_session,
-            session=session,
-            questionnaire=questionnaire,
-            question_id=question["id"],
-            option_id=question["options"][0]["id"],
-        )
+        if question["type"] == "currency_amount":
+            numeric_value = {
+                "portfolio_value": 50000.0,
+                "major_expense_withdrawal_amount": 10000.0,
+                "essential_monthly_expenses": 2500.0,
+            }[question["id"]]
+            session = upsert_answer(
+                db_session,
+                session=session,
+                questionnaire=questionnaire,
+                question_id=question["id"],
+                numeric_value=numeric_value,
+            )
+        else:
+            session = upsert_answer(
+                db_session,
+                session=session,
+                questionnaire=questionnaire,
+                question_id=question["id"],
+                option_id=question["options"][0]["id"],
+            )
     return session

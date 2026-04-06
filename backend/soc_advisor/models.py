@@ -1,4 +1,15 @@
-"""Database models for questionnaire sessions and answers."""
+"""SQLAlchemy models for persisted questionnaire sessions and answers.
+
+This file owns the SQLite table structure for the advisor experiment.
+
+It does not decide:
+
+- which question comes next
+- how a profile is chosen
+- how allocation works
+
+Those decisions live higher up in `services.py` and `portfolio.py`.
+"""
 
 from __future__ import annotations
 

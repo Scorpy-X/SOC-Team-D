@@ -1,4 +1,12 @@
-"""Pure formatting helpers for the Chainlit experiment copy."""
+"""Pure formatting helpers for the Chainlit experiment copy.
+
+This module has one job: turn already-computed state into readable text.
+
+Keeping this separate from the chat controller makes the flow easier to read:
+
+- `chat_app.py` decides *when* to show something
+- this file decides *how* the text should look
+"""
 
 from __future__ import annotations
 
@@ -8,6 +16,11 @@ from .schemas import ProfileSummary, RecommendationSummary, SessionStateResponse
 
 
 DISPLAY_SUPER_CLASS_ORDER = ("Cash", "Fixed Income", "Equity", "Fund")
+
+
+#
+# Small reusable text helpers
+#
 
 
 def get_question_label(
@@ -23,6 +36,18 @@ def get_question_label(
 
 def _format_percentage(value: float) -> str:
     return f"{value:.0%}"
+
+
+def _currency_help_text(question: dict[str, Any]) -> str:
+    """Build the short input-format guidance for currency questions."""
+
+    example = (question.get("validation") or {}).get("example")
+    if example:
+        return (
+            "Reply with a dollar amount. You can include a dollar sign and commas, "
+            f"for example: {example}."
+        )
+    return "Reply with a dollar amount. You can include a dollar sign and commas."
 
 
 def build_answer_summary_lines(
@@ -89,6 +114,11 @@ def format_band_choice_lines(profile_bands: list[dict[str, Any]]) -> list[str]:
     return lines
 
 
+#
+# Major rendered blocks used by the chat controller
+#
+
+
 def render_sidebar_content(
     state: SessionStateResponse,
     *,
@@ -114,6 +144,7 @@ def render_sidebar_content(
         "questionnaire": "In progress",
         "review": "Review",
         "editing": "Updating answer",
+        "numeric_confirm": "Confirm amount",
         "submitted": "Profile ready",
     }
     parts = [
@@ -159,6 +190,15 @@ def format_question(
 ) -> str:
     """Format one questionnaire prompt for the chat window."""
 
+    if question.get("type") == "currency_amount":
+        help_text = f"\n\n{question['help_text']}" if question.get("help_text") else ""
+        return (
+            f"**Question {question['order']} of {total_questions} - {question_label}**\n\n"
+            f"{question['text']}"
+            f"{help_text}\n\n"
+            f"{_currency_help_text(question)}"
+        )
+
     option_lines = [
         f"{index}. {option['label']}"
         for index, option in enumerate(question["options"], start=1)
@@ -181,6 +221,15 @@ def format_edit_prompt(
     current_label: str,
 ) -> str:
     """Format the prompt used when the user edits an existing answer."""
+
+    if question.get("type") == "currency_amount":
+        return (
+            f"**Update question {question['order']} of {total_questions} - {question_label}**\n\n"
+            "Let's revise this amount.\n\n"
+            f"Currently recorded: **{current_label}**\n\n"
+            f"{question['text']}\n\n"
+            f"{_currency_help_text(question)}"
+        )
 
     return (
         f"**Update question {question['order']} of {total_questions} - {question_label}**\n\n"
