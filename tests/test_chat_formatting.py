@@ -33,7 +33,7 @@ QUESTION_LABELS = {
     "financial_knowledge": "Knowledge",
 }
 QUESTIONS_BY_ID = {
-    "portfolio_value": {"text": "What is your portfolio value? Please enter the dollar amount you will be investing today. The minimum portfolio value for this questionnaire is $25,000."},
+    "portfolio_value": {"text": "How much are you investing in this portfolio today? The minimum portfolio value for this questionnaire is $25,000."},
     "financial_knowledge": {"text": "How knowledgeable are you about financial and investment concepts?"},
 }
 
@@ -184,8 +184,8 @@ def test_currency_amount_prompts_use_amount_specific_copy() -> None:
         current_label="$50,000.00",
     )
 
-    assert "Reply with a dollar amount." in prompt
-    assert "$50,000" in prompt
+    assert "Enter a dollar amount at or above $25,000." in prompt
+    assert prompt.count("$50,000") == 1
     assert "Let's revise this amount." in edit_prompt
 
 
@@ -196,7 +196,23 @@ def test_render_profile_summary_numbers_answers_in_final_output() -> None:
         _sample_recommendation(),
     )
 
-    assert "1. **What is your portfolio value? Please enter the dollar amount you will be investing today. The minimum portfolio value for this questionnaire is $25,000.:** $50,000.00" in text
-    assert "2. **How knowledgeable are you about financial and investment concepts?:** Very knowledgeable" in text
-    assert "Score:** Not used in this mock-band run." in text
-    assert "Band policy used" in text
+    assert "Draft portfolio snapshot: Growth" in text
+    assert "Portfolio value used for display:** $50,000.00" in text
+    assert "Portfolio mix" in text
+    assert "**Equity:** 60% / about $30,000.00" in text
+    assert "Estimated annual return:** 10.0% / about $5,000.00" in text
+    assert "Annual volatility equivalent:** 7.0% / about $3,500.00" in text
+    assert "Answers captured" not in text
+    assert "Band policy used" not in text
+    assert "BQB" not in text
+
+
+def test_render_profile_summary_mentions_html_report_when_attached(tmp_path: Path) -> None:
+    text = render_profile_summary(
+        _sample_state(),
+        _sample_profile(),
+        _sample_recommendation(),
+        user_report_path=tmp_path / "portfolio-report.html",
+    )
+
+    assert "attached the detailed HTML portfolio report" in text

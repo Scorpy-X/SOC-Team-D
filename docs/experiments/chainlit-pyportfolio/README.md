@@ -1,6 +1,6 @@
 # Chat-Based Prototype Docs
 
-This folder explains the current Week 4 advisor prototype in plain language.
+This folder explains the current Week 5 advisor prototype in plain language.
 
 At a high level, the prototype works like this:
 
@@ -9,6 +9,7 @@ At a high level, the prototype works like this:
 3. the user reviews the answers and can change one if needed
 4. the user chooses a draft investor profile
 5. the system produces a sample portfolio inside the limits for that profile
+6. the chatbot gives a short summary and attaches a generated HTML portfolio report
 
 ## What This Prototype Does
 
@@ -17,7 +18,9 @@ At a high level, the prototype works like this:
 - saves answers as the conversation goes
 - lets the user review numbered answers and update them by question number
 - lets the user choose one of five draft investor profiles manually
-- returns a sample portfolio with holdings, summary metrics, and policy limits
+- returns a compact portfolio summary in the chat
+- generates a user-facing HTML report with the detailed portfolio explanation
+- generates a technical audit report with decision trace details
 
 ## What Is Important To Know
 
@@ -26,6 +29,8 @@ At a high level, the prototype works like this:
 - money amount answers are collected and reviewed, but they do not yet change the portfolio recommendation
 - free-text narrative answers are still not part of the live prototype
 - the system tries to use live SOC data first and falls back to the saved local dataset if the live source is unavailable
+- generated report files are local runtime artifacts under `data/reports/` and should not be committed
+- optional OpenAI support can rewrite report prose only; it cannot change holdings, metrics, profile selection, or allocation logic
 
 ## Read These First
 
@@ -51,4 +56,6 @@ Main prototype files:
 
 - `experiments/chainlit_chat/chat_app.py`
 - `backend/soc_advisor/`
+- `backend/soc_advisor/reporting.py`
+- `backend/soc_advisor/report_templates/`
 - `tests/`

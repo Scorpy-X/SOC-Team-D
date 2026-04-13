@@ -52,8 +52,10 @@ from soc_advisor.chat_formatting import (  # noqa: E402
 )
 from soc_advisor.database import Base, SessionLocal, engine  # noqa: E402
 from soc_advisor.portfolio import list_profile_bands  # noqa: E402
+from soc_advisor.reporting import generate_portfolio_reports  # noqa: E402
 from soc_advisor.schemas import (  # noqa: E402
     AnswerSummary,
+    DecisionTrace,
     ProfileSummary,
     RecommendationSummary,
     SessionStateResponse,
@@ -61,6 +63,7 @@ from soc_advisor.schemas import (  # noqa: E402
 from soc_advisor.services import (  # noqa: E402
     build_session_state,
     create_assessment_session,
+    get_saved_decision_trace,
     get_session_or_404,
     is_question_active,
     load_questionnaire,
@@ -274,7 +277,7 @@ def submit_chat_session(
     session_id: str,
     *,
     mock_profile_band: str | None,
-) -> tuple[SessionStateResponse, ProfileSummary, RecommendationSummary]:
+) -> tuple[SessionStateResponse, ProfileSummary, RecommendationSummary, DecisionTrace]:
     """Submit the session, which triggers the portfolio generation flow."""
 
     with SessionLocal() as db:
@@ -284,8 +287,14 @@ def submit_chat_session(
             session=session,
             mock_profile_band=mock_profile_band,
         )
+        decision_trace = get_saved_decision_trace(submitted_session)
         questionnaire = load_questionnaire(submitted_session.questionnaire_version)
-        return build_session_state(submitted_session, questionnaire), profile, recommendation
+        return (
+            build_session_state(submitted_session, questionnaire),
+            profile,
+            recommendation,
+            decision_trace,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -747,16 +756,37 @@ async def handle_review_submission(session_id: str) -> None:
         ).send()
         return
 
-    state, profile, recommendation = submit_chat_session(
+    state, profile, recommendation, decision_trace = submit_chat_session(
         session_id,
         mock_profile_band=selected_band_choice["id"],
+    )
+    report_paths = generate_portfolio_reports(
+        state=state,
+        profile=profile,
+        recommendation=recommendation,
+        decision_trace=decision_trace,
     )
     await update_sidebar(
         state,
         stage="submitted",
         profile_text=build_profile_sidebar_text(profile),
     )
-    await cl.Message(content=render_profile_summary(state, profile, recommendation)).send()
+    await cl.Message(
+        content=render_profile_summary(
+            state,
+            profile,
+            recommendation,
+            user_report_path=report_paths.user_report_path,
+        ),
+        elements=[
+            cl.File(
+                name="SOC portfolio report.html",
+                path=str(report_paths.user_report_path),
+                display="inline",
+                mime="text/html",
+            )
+        ],
+    ).send()
 
 
 async def handle_review_stage(session_id: str, content: str) -> None:

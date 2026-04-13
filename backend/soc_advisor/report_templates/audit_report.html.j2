@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SOC Portfolio Audit Report</title>
+  {% include "_styles.html.j2" %}
+</head>
+<body class="audit">
+  <main>
+    <header class="hero">
+      <div>
+        <div class="eyebrow">SOC Advisor Prototype / Audit Copy</div>
+        <h1>{{ report.profile.profile_label }} decision trace</h1>
+        <p>{{ report.prose.executive_summary }}</p>
+      </div>
+      <div class="hero-side">
+        <div class="hero-metric">
+          <span>Portfolio value</span>
+          <strong>{{ report.portfolio_value_label or "Not captured" }}</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Session</span>
+          <strong>{{ report.session_id }}</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Generated</span>
+          <strong>{{ report.generated_at_label }}</strong>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="eyebrow">User-Facing Summary</div>
+      <h2>Same portfolio facts the client report sees.</h2>
+      <div class="metric-grid">
+        {% for metric in report.metrics %}
+        <div class="metric">
+          <span>{{ metric.label }}</span>
+          <strong>{{ metric.value }}</strong>
+          {% if metric.amount %}
+          <div class="money">{{ metric.amount }} based on {{ report.portfolio_value_label }}</div>
+          {% endif %}
+          <p>{{ metric.note }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Technical Risk Signals</div>
+      <h2>Sensitivity values kept for audit and debugging.</h2>
+      <div class="metric-grid">
+        {% for metric in report.sensitivity_metrics %}
+        <div class="metric">
+          <span>{{ metric.label }}</span>
+          <strong>{{ metric.value }}</strong>
+          <p>{{ metric.note }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Superclass Mix</div>
+        <h2>Allocation grouped by broad asset bucket.</h2>
+      </div>
+      <div class="panel">
+        <div class="stack" aria-label="Portfolio superclass allocation">
+          {% for allocation in report.class_allocations %}
+          <div
+            class="segment class-{{ allocation.slug }}"
+            title="{{ allocation.label }} {{ allocation.weight_label }}"
+            style="width: {{ allocation.bar_width }}%">
+          </div>
+          {% endfor %}
+        </div>
+        <div class="legend">
+          {% for allocation in report.class_allocations %}
+          <div class="legend-item">
+            <span>{{ allocation.label }}</span>
+            <span class="legend-values">
+              <strong>{{ allocation.weight_label }}</strong>
+              {% if allocation.amount_label %}
+              <span class="money">{{ allocation.amount_label }}</span>
+              {% endif %}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Full Holdings</div>
+      <h2>Every holding selected by the optimizer.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Superclass</th>
+            <th>Asset class</th>
+            <th>Currency</th>
+            <th>Weight</th>
+            <th>Est. allocation</th>
+            <th>Est. return</th>
+            <th>Income yield</th>
+            <th>Volatility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for holding in report.all_holdings %}
+          <tr>
+            <td>{{ holding.ticker }}</td>
+            <td>{{ holding.super_class }}</td>
+            <td>{{ holding.asset_class }}</td>
+            <td>{{ holding.currency }}</td>
+            <td class="numeric">{{ holding.weight_label }}</td>
+            <td class="numeric">{{ holding.amount_label or "N/A" }}</td>
+            <td class="numeric">{{ holding.expected_return_label }}</td>
+            <td class="numeric">{{ holding.income_yield_label }}</td>
+            <td class="numeric">{{ holding.volatility_label }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <div class="eyebrow">Decision Trace</div>
+      <h2>What produced this result.</h2>
+      <table>
+        <tbody>
+          {% for row in report.trace_rows %}
+          <tr>
+            <th>{{ row.label }}</th>
+            <td>{{ row.value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <div class="eyebrow">Captured Answers</div>
+      <h2>Questionnaire inputs saved for this run.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Type</th>
+            <th>Used for scoring</th>
+            <th>Used directly in allocation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for answer in report.decision_trace.captured_answers %}
+          <tr>
+            <td>{{ answer.question_text }}</td>
+            <td>{{ answer.answer_label }}</td>
+            <td>{{ answer.answer_type }}</td>
+            <td>{{ "yes" if answer.used_for_scoring else "no" }}</td>
+            <td>{{ "yes" if answer.used_for_allocation else "no" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <div class="eyebrow">Constraints</div>
+      <h2>Band policy applied before solving.</h2>
+      <div class="summary">
+        <div class="panel">
+          <h3>Superclass minima</h3>
+          <ul class="note-list">
+            {% for label, value in report.decision_trace.super_class_minima.items() %}
+            <li>{{ label }}: {{ "%.1f"|format(value * 100) }}%</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Superclass maxima</h3>
+          <ul class="note-list">
+            {% for label, value in report.decision_trace.super_class_maxima.items() %}
+            <li>{{ label }}: {{ "%.1f"|format(value * 100) }}%</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Raw Trace JSON</div>
+      <h2>Machine-readable audit payload.</h2>
+      <pre>{{ report.trace_json }}</pre>
+    </section>
+  </main>
+</body>
+</html>

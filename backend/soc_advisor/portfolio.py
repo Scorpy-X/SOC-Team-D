@@ -320,6 +320,18 @@ def load_portfolio_frames() -> tuple[pd.DataFrame, pd.DataFrame, str]:
     return assets, covariance, "live_soc_api"
 
 
+def get_active_portfolio_data_source() -> str:
+    """Return the currently selected portfolio input source.
+
+    ``load_portfolio_frames`` is cached, so after a recommendation is built this
+    reads the same live-or-snapshot decision instead of starting a new data
+    loading path.
+    """
+
+    _, _, data_source = load_portfolio_frames()
+    return data_source
+
+
 # ---------------------------------------------------------------------------
 # Band/policy translation
 # ---------------------------------------------------------------------------

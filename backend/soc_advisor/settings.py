@@ -28,6 +28,8 @@ DATABASE_ENV_KEYS = ("SOC_ADVISOR_DATABASE_URL", "DATABASE_URL")
 DEFAULT_QUESTIONNAIRE_VERSION = "v3"
 DEFAULT_SCORING_VERSION = "v4"
 DEFAULT_PORTFOLIO_VERSION = "v2"
+DEFAULT_REPORTS_DIR = ROOT_DIR / "data" / "reports"
+DEFAULT_REPORT_LLM_MODEL = "gpt-5.4-mini"
 
 
 @dataclass(frozen=True)
@@ -44,12 +46,34 @@ class AppSettings:
     portfolio_dir: Path
     snapshot_dir: Path
     cors_origins: list[str]
+    openai_api_key: str | None
+    advisor_report_use_llm: bool
+    advisor_report_llm_model: str | None
+    advisor_report_llm_timeout_seconds: float
+    advisor_report_llm_temperature: float
+    advisor_reports_dir: Path
 
 
 def _parse_cors_origins(raw_value: str) -> list[str]:
     if not raw_value.strip():
         return ["*"]
     return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
+
+
+def _parse_bool(raw_value: str | None, *, default: bool = False) -> bool:
+    """Parse simple env-var booleans without making settings callers care."""
+
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _parse_float(raw_value: str | None, *, default: float) -> float:
+    """Parse numeric env settings with a safe default."""
+
+    if raw_value is None or not raw_value.strip():
+        return default
+    return float(raw_value)
 
 
 @lru_cache(maxsize=1)
@@ -62,6 +86,9 @@ def get_settings() -> AppSettings:
     scoring_dir = ROOT_DIR / "config" / "scoring"
     portfolio_dir = ROOT_DIR / "config" / "portfolio"
     snapshot_dir = ROOT_DIR / "data" / "exports"
+    reports_dir = Path(os.getenv("ADVISOR_REPORTS_DIR", str(DEFAULT_REPORTS_DIR)))
+    if not reports_dir.is_absolute():
+        reports_dir = ROOT_DIR / reports_dir
     database_url = DEFAULT_DATABASE_URL
     for env_key in DATABASE_ENV_KEYS:
         env_value = os.getenv(env_key)
@@ -83,4 +110,18 @@ def get_settings() -> AppSettings:
         portfolio_dir=portfolio_dir,
         snapshot_dir=snapshot_dir,
         cors_origins=_parse_cors_origins(os.getenv("CORS_ORIGINS", "*")),
+        openai_api_key=os.getenv("OPENAI_API_KEY") or None,
+        advisor_report_use_llm=_parse_bool(os.getenv("ADVISOR_REPORT_USE_LLM")),
+        advisor_report_llm_model=(
+            os.getenv("ADVISOR_REPORT_LLM_MODEL") or DEFAULT_REPORT_LLM_MODEL
+        ),
+        advisor_report_llm_timeout_seconds=_parse_float(
+            os.getenv("ADVISOR_REPORT_LLM_TIMEOUT_SECONDS"),
+            default=20.0,
+        ),
+        advisor_report_llm_temperature=_parse_float(
+            os.getenv("ADVISOR_REPORT_LLM_TEMPERATURE"),
+            default=0.2,
+        ),
+        advisor_reports_dir=reports_dir,
     )

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Draft Portfolio Report</title>
+  {% include "_styles.html.j2" %}
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Draft portfolio report</div>
+        <h1>{{ report.profile.profile_label }} portfolio report</h1>
+        <p>{{ report.prose.executive_summary }}</p>
+      </div>
+      <div class="hero-side">
+        <div class="hero-metric">
+          <span>Portfolio value</span>
+          <strong>{{ report.portfolio_value_label or "Not captured" }}</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Recommendation basis</span>
+          <strong>{{ report.recommendation_basis_label }}</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Generated</span>
+          <strong>{{ report.generated_at_label }}</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Portfolio Mix</div>
+        <h2>Broad investment mix first.</h2>
+      </div>
+      <div class="panel">
+        <div class="stack" aria-label="Portfolio investment type mix">
+          {% for allocation in report.class_allocations %}
+          <div
+            class="segment class-{{ allocation.slug }}"
+            title="{{ allocation.label }} {{ allocation.weight_label }}"
+            style="width: {{ allocation.bar_width }}%">
+          </div>
+          {% endfor %}
+        </div>
+        <div class="legend">
+          {% for allocation in report.class_allocations %}
+          <div class="legend-item">
+            <span>{{ allocation.label }}</span>
+            <span class="legend-values">
+              <strong>{{ allocation.weight_label }}</strong>
+              {% if allocation.amount_label %}
+              <span class="money">{{ allocation.amount_label }}</span>
+              {% endif %}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        <p>{{ report.prose.allocation_explanation }}</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Metrics</div>
+      <h2>Key estimates in plain language.</h2>
+      <div class="metric-grid">
+        {% for metric in report.metrics %}
+        <div class="metric">
+          <span>{{ metric.label }}</span>
+          <strong>{{ metric.value }}</strong>
+          {% if metric.amount %}
+          <div class="money">{{ metric.amount }} based on {{ report.portfolio_value_label }}</div>
+          {% endif %}
+          <p>{{ metric.note }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Currency Exposure</div>
+        <h2>Where the money is denominated.</h2>
+      </div>
+      <div class="panel">
+        {% for allocation in report.currency_allocations %}
+        <div class="legend-item">
+          <span>{{ allocation.label }}</span>
+          <span class="legend-values">
+            <strong>{{ allocation.weight_label }}</strong>
+            {% if allocation.amount_label %}
+            <span class="money">{{ allocation.amount_label }}</span>
+            {% endif %}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Investments</div>
+      <h2>Investments grouped by type.</h2>
+      <p class="panel-subtle">Asset codes are the short market identifiers used to refer to each investment.</p>
+      {% for group in report.grouped_holdings %}
+      <div class="holdings-group">
+        <div>
+          <h3>{{ group.super_class }}</h3>
+          <p>{{ group.weight_label }} of the portfolio</p>
+        </div>
+        <div>
+          {% for holding in group.holdings %}
+          <div class="holding-row">
+            <div><span class="asset-code-pill">{{ holding.asset_code }}</span></div>
+            <div class="holding-detail">
+              <strong>{{ holding.asset_class }}</strong>
+              <span>{{ holding.currency }} / {{ holding.super_class }}</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: {{ holding.bar_width }}%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>{{ holding.weight_label }}</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+              {% if holding.amount_label %}
+              <strong>{{ holding.amount_label }}</strong>
+              <div class="money">estimated amount</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+
+    <section>
+      <div class="eyebrow">Concentration Check</div>
+      <h2>How much is concentrated in the largest investments.</h2>
+      <div class="metric-grid">
+        <div class="metric">
+          <span>Largest investment</span>
+          {% if report.largest_holding %}
+          <strong>{{ report.largest_holding.asset_code }} {{ report.largest_holding.weight_label }}</strong>
+          {% if report.largest_holding.amount_label %}
+          <div class="money">{{ report.largest_holding.amount_label }} based on {{ report.portfolio_value_label }}</div>
+          {% endif %}
+          <p>{{ report.largest_holding.asset_class }} / {{ report.largest_holding.currency }}</p>
+          {% else %}
+          <strong>N/A</strong>
+          <p>No investments were available.</p>
+          {% endif %}
+        </div>
+        <div class="metric">
+          <span>Top 3 investments</span>
+          <strong>{{ report.top_three_weight_label }}</strong>
+          {% if report.top_three_amount_label %}
+          <div class="money">{{ report.top_three_amount_label }} based on {{ report.portfolio_value_label }}</div>
+          {% endif %}
+          <p>Combined weight of the three largest investments.</p>
+        </div>
+        <div class="metric">
+          <span>Top 5 investments</span>
+          <strong>{{ report.top_five_weight_label }}</strong>
+          {% if report.top_five_amount_label %}
+          <div class="money">{{ report.top_five_amount_label }} based on {{ report.portfolio_value_label }}</div>
+          {% endif %}
+          <p>Combined weight of the five largest investments.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Full investment list</div>
+      <h2>All investments included in this draft portfolio.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Asset code</th>
+            <th>Investment type</th>
+            <th>Asset class</th>
+            <th>Currency</th>
+            <th>Weight</th>
+            <th>Estimated amount</th>
+            <th>Estimated yearly return</th>
+            <th>Estimated income</th>
+            <th>Expected yearly movement</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for holding in report.all_holdings %}
+          <tr>
+            <td>{{ holding.asset_code }}</td>
+            <td>{{ holding.super_class }}</td>
+            <td>{{ holding.asset_class }}</td>
+            <td>{{ holding.currency }}</td>
+            <td class="numeric">{{ holding.weight_label }}</td>
+            <td class="numeric">{{ holding.amount_label or "N/A" }}</td>
+            <td class="numeric">{{ holding.expected_return_label }}</td>
+            <td class="numeric">{{ holding.income_yield_label }}</td>
+            <td class="numeric">{{ holding.volatility_label }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Important Limits</div>
+        <h2>What this report cannot promise.</h2>
+      </div>
+      <div class="panel">
+        <p>{{ report.prose.limitation_note }}</p>
+        <ul class="note-list">
+          {% for limitation in report.user_limitation_notes %}
+          <li>{{ limitation }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

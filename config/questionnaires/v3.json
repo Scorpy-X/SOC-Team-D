@@ -6,8 +6,8 @@
     {
       "id": "portfolio_value",
       "order": 1,
-      "text": "What is your portfolio value? Please enter the dollar amount you will be investing today. The minimum portfolio value for this questionnaire is $25,000.",
-      "help_text": "Enter a dollar amount at or above $25,000. You can include a dollar sign and commas, for example: $50,000.",
+      "text": "How much are you investing in this portfolio today? The minimum portfolio value for this questionnaire is $25,000.",
+      "help_text": "You can type a plain number or include a dollar sign and commas, for example: $50,000.",
       "type": "currency_amount",
       "dimension": "portfolio_value",
       "required": true,
@@ -21,8 +21,8 @@
     {
       "id": "major_expense_withdrawal_amount",
       "order": 2,
-      "text": "What is the dollar amount of any major expense you anticipate needing to withdraw over the next 12 to 24 months?",
-      "help_text": "This captures known near-term withdrawal pressure from house, education, or lifestyle expenses.",
+      "text": "How much might you need to withdraw for a major expense in the next 12 to 24 months?",
+      "help_text": "Use 0 if no major withdrawal is expected. This is captured for liquidity review but is not yet used in allocation.",
       "type": "currency_amount",
       "dimension": "major_expense_withdrawal_amount",
       "required": true,
@@ -36,8 +36,8 @@
     {
       "id": "essential_monthly_expenses",
       "order": 3,
-      "text": "What is the dollar amount of your essential monthly expenses?",
-      "help_text": "This supports the liquidity-need reference calculation, but it is not yet used in the active allocation path.",
+      "text": "What are your estimated essential monthly expenses?",
+      "help_text": "This supports the liquidity review, but it is not yet used in the active allocation path.",
       "type": "currency_amount",
       "dimension": "essential_monthly_expenses",
       "required": true,

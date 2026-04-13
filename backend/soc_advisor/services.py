@@ -29,9 +29,15 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from .models import AssessmentAnswer, AssessmentSession, utc_now
-from .portfolio import build_recommendation, load_portfolio_config
+from .portfolio import (
+    build_recommendation,
+    get_active_portfolio_data_source,
+    load_portfolio_config,
+)
 from .schemas import (
     AnswerSummary,
+    CapturedAnswerTrace,
+    DecisionTrace,
     ProfileSummary,
     RecommendationSummary,
     SessionStateResponse,
@@ -652,6 +658,7 @@ def save_submission_result(
     session: AssessmentSession,
     profile: ProfileSummary,
     recommendation: RecommendationSummary,
+    decision_trace: DecisionTrace,
 ) -> AssessmentSession:
     """Persist the computed profile and recommendation onto the session.
 
@@ -666,6 +673,7 @@ def save_submission_result(
         {
             "profile": profile.model_dump(),
             "recommendation": recommendation.model_dump(),
+            "decision_trace": decision_trace.model_dump(),
         }
     )
     session.submitted_at = utc_now()
@@ -675,6 +683,97 @@ def save_submission_result(
     db.commit()
     db.refresh(session)
     return session
+
+
+def _build_captured_answer_trace(
+    session: AssessmentSession,
+    questionnaire: dict[str, Any],
+) -> list[CapturedAnswerTrace]:
+    """Convert saved answers into trace facts for report/audit use."""
+
+    questions_by_id = _question_lookup(questionnaire)
+    answers_lookup = answers_by_question(session)
+    answer_traces: list[CapturedAnswerTrace] = []
+
+    for question in sorted(questionnaire["questions"], key=lambda item: item["order"]):
+        if not is_question_active(question, answers_lookup):
+            continue
+        answer = answers_lookup.get(question["id"])
+        if answer is None:
+            continue
+
+        question_type = _question_type(question)
+        used_for_scoring = bool(question.get("used_for_scoring", True))
+        # Current Variant B allocation does not consume raw questionnaire
+        # answers. It only uses the selected/scored profile band.
+        used_for_allocation = False
+        answer_traces.append(
+            CapturedAnswerTrace(
+                question_id=question["id"],
+                question_text=questions_by_id[question["id"]]["text"],
+                answer_type=question_type,
+                answer_label=answer.answer_label_snapshot,
+                used_for_scoring=used_for_scoring,
+                used_for_allocation=used_for_allocation,
+            )
+        )
+
+    return answer_traces
+
+
+def build_decision_trace(
+    session: AssessmentSession,
+    questionnaire: dict[str, Any],
+    profile: ProfileSummary,
+    recommendation: RecommendationSummary,
+) -> DecisionTrace:
+    """Build the internal explanation facts for one submitted session."""
+
+    portfolio_config = load_portfolio_config(recommendation.version)
+    optimizer_config = portfolio_config["optimizer"]
+    configured_bounds = optimizer_config.get("weight_bounds", [0.0, 1.0])
+    effective_upper_bound = min(
+        float(configured_bounds[1]),
+        recommendation.constraints.single_asset_cap,
+    )
+    captured_answers = _build_captured_answer_trace(session, questionnaire)
+    captured_but_not_used = [
+        answer.question_id
+        for answer in captured_answers
+        if answer.answer_type == "currency_amount"
+    ]
+
+    limitations = [
+        "The live Chainlit demo still uses manual mock-band selection as the primary path.",
+        "Questionnaire-to-band scoring is retained as a backend fallback, not as the final approved suitability model.",
+        "Numeric liquidity inputs are captured and reviewable but do not yet drive profile selection or portfolio construction.",
+        "Expected returns are model inputs and estimates, not guarantees.",
+        "Covariance PSD repair is a numerical stability step applied before optimization, not a change to the investment policy.",
+    ]
+
+    return DecisionTrace(
+        questionnaire_version=session.questionnaire_version,
+        scoring_version=session.scoring_version,
+        portfolio_version=recommendation.version,
+        profile_band=profile.profile_band,
+        profile_label=profile.profile_label,
+        profile_source=profile.profile_source,
+        data_source=get_active_portfolio_data_source(),
+        optimizer_objective=str(optimizer_config.get("objective", recommendation.objective)),
+        risk_free_rate=float(optimizer_config.get("risk_free_rate", 0.0)),
+        weight_bounds=[float(configured_bounds[0]), effective_upper_bound],
+        single_asset_cap=recommendation.constraints.single_asset_cap,
+        covariance_psd_repair_enabled=bool(
+            optimizer_config.get("repair_nonpositive_semidefinite", False)
+        ),
+        super_class_minima=recommendation.constraints.super_class_minima,
+        super_class_maxima=recommendation.constraints.super_class_maxima,
+        metric_minima=recommendation.constraints.metric_minima,
+        metric_maxima=recommendation.constraints.metric_maxima,
+        captured_answers=captured_answers,
+        captured_but_not_used=captured_but_not_used,
+        limitations=limitations,
+    )
 
 
 def get_saved_recommendation(session: AssessmentSession) -> RecommendationSummary:
@@ -694,6 +793,25 @@ def get_saved_recommendation(session: AssessmentSession) -> RecommendationSummar
             detail="The saved session result is missing the recommendation payload.",
         )
     return RecommendationSummary.model_validate(recommendation_payload)
+
+
+def get_saved_decision_trace(session: AssessmentSession) -> DecisionTrace:
+    """Return the persisted decision trace for a submitted session."""
+
+    if not session.result_json:
+        raise HTTPException(
+            status_code=409,
+            detail="This session does not have a saved decision trace yet.",
+        )
+
+    payload = json.loads(session.result_json)
+    trace_payload = payload.get("decision_trace")
+    if trace_payload is None:
+        raise HTTPException(
+            status_code=500,
+            detail="The saved session result is missing the decision trace payload.",
+        )
+    return DecisionTrace.model_validate(trace_payload)
 
 
 def get_saved_profile(session: AssessmentSession) -> ProfileSummary:
@@ -738,10 +856,17 @@ def submit_assessment(
         mock_profile_band=mock_profile_band,
     )
     recommendation = build_recommendation(profile=profile)
+    decision_trace = build_decision_trace(
+        session,
+        questionnaire,
+        profile,
+        recommendation,
+    )
     saved_session = save_submission_result(
         db,
         session=session,
         profile=profile,
         recommendation=recommendation,
+        decision_trace=decision_trace,
     )
     return saved_session, profile, recommendation

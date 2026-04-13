@@ -167,6 +167,50 @@ class RecommendationSummary(BaseModel):
 
 
 #
+# Internal explanation/reporting models
+#
+
+
+class CapturedAnswerTrace(BaseModel):
+    question_id: str
+    question_text: str
+    answer_type: str
+    answer_label: str
+    used_for_scoring: bool
+    used_for_allocation: bool
+
+
+class DecisionTrace(BaseModel):
+    """Internal facts used to defend how one recommendation was produced.
+
+    This model is intentionally not returned by the public recommendation
+    endpoint yet. It is persisted in ``result_json`` so reports and audit tools
+    can explain the run without changing the database schema.
+    """
+
+    trace_version: str = "decision-trace-v1"
+    questionnaire_version: str
+    scoring_version: str
+    portfolio_version: str
+    profile_band: str
+    profile_label: str
+    profile_source: str
+    data_source: str
+    optimizer_objective: str
+    risk_free_rate: float
+    weight_bounds: list[float]
+    single_asset_cap: float
+    covariance_psd_repair_enabled: bool
+    super_class_minima: dict[str, float]
+    super_class_maxima: dict[str, float]
+    metric_minima: dict[str, float]
+    metric_maxima: dict[str, float]
+    captured_answers: list[CapturedAnswerTrace]
+    captured_but_not_used: list[str]
+    limitations: list[str]
+
+
+#
 # Submit/result wrapper models
 #
 

@@ -10,6 +10,8 @@ Keeping this separate from the chat controller makes the flow easier to read:
 
 from __future__ import annotations
 
+from pathlib import Path
+import re
 from typing import Any
 
 from .schemas import ProfileSummary, RecommendationSummary, SessionStateResponse
@@ -38,16 +40,53 @@ def _format_percentage(value: float) -> str:
     return f"{value:.0%}"
 
 
+def _format_percentage_precise(value: float) -> str:
+    return f"{value:.1%}"
+
+
+def _format_money(value: float) -> str:
+    return f"${value:,.2f}"
+
+
+def _parse_money_label(label: str) -> float | None:
+    """Parse saved display labels like ``$50,000.00`` for chat-only summaries."""
+
+    normalized = label.strip()
+    if normalized.startswith("$"):
+        normalized = normalized[1:].strip()
+    normalized = normalized.replace(",", "")
+    if not re.fullmatch(r"\d+(?:\.\d+)?", normalized):
+        return None
+    return float(normalized)
+
+
+def _portfolio_value_from_answers(state: SessionStateResponse) -> float | None:
+    """Find the saved portfolio value so the final chat can show estimates."""
+
+    for answer in state.answers:
+        if answer.question_id != "portfolio_value":
+            continue
+        return _parse_money_label(answer.answer_label)
+    return None
+
+
 def _currency_help_text(question: dict[str, Any]) -> str:
     """Build the short input-format guidance for currency questions."""
 
+    help_text = str(question.get("help_text") or "").strip()
     example = (question.get("validation") or {}).get("example")
+    if help_text and example and example in help_text:
+        return help_text
     if example:
         return (
-            "Reply with a dollar amount. You can include a dollar sign and commas, "
-            f"for example: {example}."
+            f"{help_text}\n\n" if help_text else ""
+        ) + f"Enter a dollar amount such as `{example}`. Dollar signs and commas are okay."
+    if help_text:
+        return (
+            f"{help_text}\n\n"
+            "Enter a dollar amount. Dollar signs and commas are okay."
         )
-    return "Reply with a dollar amount. You can include a dollar sign and commas."
+    return "Enter a dollar amount. Dollar signs and commas are okay."
 
 
 def build_answer_summary_lines(
@@ -111,6 +150,61 @@ def format_band_choice_lines(profile_bands: list[dict[str, Any]]) -> list[str]:
             f"{choice['order']}. **{choice['label']}**"
             + (f" - {range_text}" if range_text else "")
         )
+    return lines
+
+
+def format_super_class_mix_from_holdings(
+    recommendation: RecommendationSummary,
+    *,
+    portfolio_value: float | None = None,
+) -> list[str]:
+    """Render the final superclass mix without listing every holding in chat."""
+
+    totals: dict[str, float] = {}
+    for holding in recommendation.holdings:
+        totals[holding.super_class] = totals.get(holding.super_class, 0.0) + holding.weight
+
+    lines: list[str] = []
+    ordered_labels = list(DISPLAY_SUPER_CLASS_ORDER) + sorted(
+        label for label in totals if label not in DISPLAY_SUPER_CLASS_ORDER
+    )
+    for label in ordered_labels:
+        weight = totals.get(label, 0.0)
+        if weight <= 0:
+            continue
+        amount_text = (
+            f" / about {_format_money(portfolio_value * weight)}"
+            if portfolio_value is not None
+            else ""
+        )
+        lines.append(f"- **{label}:** {_format_percentage(weight)}{amount_text}")
+    return lines
+
+
+def format_metric_snapshot_lines(
+    recommendation: RecommendationSummary,
+    *,
+    portfolio_value: float | None,
+) -> list[str]:
+    """Return a compact metrics block for the final chat response."""
+
+    metrics = recommendation.metrics
+    rows = [
+        ("Estimated annual return", metrics.expected_return),
+        ("Annual volatility equivalent", metrics.volatility),
+        ("Estimated annual income yield", metrics.income_yield_ann),
+    ]
+    lines: list[str] = []
+    for label, value in rows:
+        amount_text = (
+            f" / about {_format_money(portfolio_value * value)}"
+            if portfolio_value is not None
+            else ""
+        )
+        lines.append(f"- **{label}:** {_format_percentage_precise(value)}{amount_text}")
+    lines.append(
+        "- **Note:** the volatility dollar figure is a scale estimate, not a maximum loss."
+    )
     return lines
 
 
@@ -191,12 +285,10 @@ def format_question(
     """Format one questionnaire prompt for the chat window."""
 
     if question.get("type") == "currency_amount":
-        help_text = f"\n\n{question['help_text']}" if question.get("help_text") else ""
         return (
             f"**Question {question['order']} of {total_questions} - {question_label}**\n\n"
             f"{question['text']}"
-            f"{help_text}\n\n"
-            f"{_currency_help_text(question)}"
+            f"\n\n{_currency_help_text(question)}"
         )
 
     option_lines = [
@@ -294,69 +386,67 @@ def render_profile_summary(
     state: SessionStateResponse,
     profile: ProfileSummary,
     recommendation: RecommendationSummary,
+    *,
+    user_report_path: Path | None = None,
 ) -> str:
-    """Build the final chat summary after submission."""
+    """Build the final chat summary after submission.
 
-    answer_lines = build_answer_summary_lines(
-        state,
-        questions_by_id={answer.question_id: {"text": answer.question_text} for answer in state.answers},
-        question_labels={},
-        numbered=True,
-        use_full_question_text=True,
-    )
-    reason_lines = [f"- {reason}" for reason in profile.reasons]
-    portfolio_lines = [
-        (
-            f"- **{holding.ticker}** ({holding.super_class} / {holding.asset_class}): "
-            f"{holding.weight:.1%}"
-        )
-        for holding in recommendation.holdings
-    ]
-    constraint_lines = [
-        f"- **Objective:** {recommendation.objective}",
-        f"- **Single asset cap:** {recommendation.constraints.single_asset_cap:.0%}",
-    ] + [
-        f"- {line}"
-        for line in format_super_class_ranges(
-            recommendation.constraints.super_class_minima,
-            recommendation.constraints.super_class_maxima,
-        )
-    ]
-    note_lines = [f"- {note}" for note in recommendation.notes]
+    The detailed holdings now live in the generated HTML report. Keeping the
+    chat answer short makes the final screen easier to read.
+    """
+
     source_label = (
         "Manual mock band selection"
         if profile.profile_source == "manual_mock_band"
         else "Scored questionnaire"
     )
-    score_line = (
-        f"**Score:** {profile.profile_score:.1f}\n"
+    score_text = (
+        f"Score {profile.profile_score:.1f}"
         if profile.profile_score is not None
-        else "**Score:** Not used in this mock-band run.\n"
+        else "score not used in this mock-band run"
     )
+    portfolio_value = _portfolio_value_from_answers(state)
+    portfolio_value_line = (
+        f"**Portfolio value used for display:** {_format_money(portfolio_value)}  \n"
+        if portfolio_value is not None
+        else ""
+    )
+    mix_lines = format_super_class_mix_from_holdings(
+        recommendation,
+        portfolio_value=portfolio_value,
+    )
+    metric_lines = format_metric_snapshot_lines(
+        recommendation,
+        portfolio_value=portfolio_value,
+    )
+    report_line = (
+        "\n\nI attached the detailed HTML portfolio report with holdings, tables, and audit-friendly context."
+        if user_report_path is not None
+        else ""
+    )
+    profile_path_caveat = (
+        "- This is still the manual mock-band demo path."
+        if profile.profile_source == "manual_mock_band"
+        else "- This used the scored-questionnaire fallback path."
+    )
+    caveat_lines = [
+        profile_path_caveat,
+        "- Dollar figures are estimates based on the portfolio value you entered; they do not change the allocation.",
+        "- Expected returns are estimates, not guarantees.",
+    ]
 
     return (
-        f"**Draft profile: {profile.profile_label}**\n\n"
-        "Thanks for working through the questionnaire. Here is the current "
-        "experimental result from the active Variant B demo path.\n\n"
-        f"**Profile source:** {source_label}  \n"
+        f"**Draft portfolio snapshot: {profile.profile_label}**\n\n"
+        f"**Profile source:** {source_label} ({score_text})  \n"
         f"**Band id:** `{profile.profile_band}`  \n"
-        f"{score_line}\n"
-        f"{profile.profile_description}\n\n"
-        "**Why this band fits**\n"
-        + "\n".join(reason_lines)
-        + "\n\n**Answers captured**\n"
-        + "\n".join(answer_lines)
-        + "\n\n**Portfolio recommendation**\n"
-        + "\n".join(portfolio_lines)
-        + "\n\n**Portfolio summary**\n"
-        + f"**Expected return:** {recommendation.metrics.expected_return:.1%}  \n"
-        + f"**Volatility:** {recommendation.metrics.volatility:.1%}  \n"
-        + f"**Income yield:** {recommendation.metrics.income_yield_ann:.1%}  \n"
-        + f"**Duration:** {recommendation.metrics.modified_duration:.2f}  \n"
-        + f"**Expense ratio:** {recommendation.metrics.expense_ratio_ann:.2%}\n"
-        + "\n\n**Band policy used**\n"
-        + "\n".join(constraint_lines)
-        + "\n\n**Recommendation notes**\n"
-        + "\n".join(note_lines)
+        f"{portfolio_value_line}"
+        f"{profile.profile_description}"
+        f"{report_line}\n\n"
+        + "\n\n**Portfolio mix**\n"
+        + "\n".join(mix_lines)
+        + "\n\n**Key estimates**\n"
+        + "\n".join(metric_lines)
+        + "\n\n**Important caveats**\n"
+        + "\n".join(caveat_lines)
         + "\n\nType `/restart` to run the questionnaire again."
     )
