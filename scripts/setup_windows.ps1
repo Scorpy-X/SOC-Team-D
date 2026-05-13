@@ -172,11 +172,7 @@ function Test-NodeVersion {
         return $version.Minor -ge 19
     }
 
-    if ($version.Major -eq 22) {
-        return $version.Minor -ge 12
-    }
-
-    return $version.Major -gt 22
+    return $version.Major -ge 22
 }
 
 function Get-NodeInfo {
@@ -275,21 +271,7 @@ function Install-FrontendDependencies {
         $arguments = @("install", "--no-audit", "--no-fund")
     }
 
-    try {
-        Invoke-NativeCommand -Command $NpmCommand -Arguments $arguments -WorkingDirectory $frontendPath
-    }
-    catch {
-        $usingLockfile = Test-Path (Join-Path $frontendPath "package-lock.json")
-        if (-not $usingLockfile -or $arguments[0] -ne "ci") {
-            throw
-        }
-
-        Write-Host ""
-        Write-Host "npm ci failed. Retrying once with npm install."
-        Write-Host "This fallback is mainly for Windows file-lock issues."
-
-        Invoke-NativeCommand -Command $NpmCommand -Arguments @("install", "--no-audit", "--no-fund") -WorkingDirectory $frontendPath
-    }
+    Invoke-NativeCommand -Command $NpmCommand -Arguments $arguments -WorkingDirectory $frontendPath
 }
 
 if ($SkipPython -and $SkipFrontend) {
@@ -325,15 +307,10 @@ Invoke-NativeCommand -Command $pythonInfo.Command -Arguments ($pythonInfo.Argume
 
 Write-Host ""
 Write-Host "Developer setup complete."
-if (Test-Path (Join-Path $projectRoot "Run Chainlit Experiment.cmd")) {
-    Write-Host "Next step: double-click Run Chainlit Experiment.cmd"
-}
-elseif (Test-Path (Join-Path $projectRoot "Run Demo.cmd")) {
-    Write-Host "Next step: double-click Run Demo.cmd"
-}
+Write-Host "Next step: double-click Run Demo.cmd"
 if (Test-Path (Join-Path $projectRoot "Run API.cmd")) {
-    Write-Host "Optional: double-click Run API.cmd to inspect the exploratory backend."
+    Write-Host "Optional: double-click Run API.cmd to start the exploratory backend."
 }
-if (Test-Path (Join-Path $projectRoot "Run Demo.cmd")) {
-    Write-Host "Secondary path: double-click Run Demo.cmd for the frontend demo."
+if (Test-Path (Join-Path $projectRoot "Run Chainlit Experiment.cmd")) {
+    Write-Host "Optional: double-click Run Chainlit Experiment.cmd to start the chat experiment."
 }

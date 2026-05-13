@@ -180,6 +180,62 @@ class CapturedAnswerTrace(BaseModel):
     used_for_allocation: bool
 
 
+class RiskRealityCheckTrace(BaseModel):
+    """Internal record of the pre-report volatility stress illustration."""
+
+    method: str = "two_standard_deviation_volatility_proxy"
+    multiplier: float = 2.0
+    annual_volatility: float
+    stress_percent: float
+    portfolio_value: float | None = None
+    stress_amount: float | None = None
+    user_action: str
+    revised_question_ids: list[str] = Field(default_factory=list)
+
+
+class LiquidityPolicyCheckTrace(BaseModel):
+    """Internal record of the pre-allocation liquidity compatibility check."""
+
+    method: str = "cash_floor_from_liquidity_need"
+    liquidity_bucket: str = "Cash"
+    portfolio_value: float
+    major_expense_withdrawal_amount: float
+    essential_monthly_expenses: float
+    emergency_fund_option_id: str
+    emergency_months_used: float
+    required_liquidity_amount: float
+    liquidity_floor: float
+    selected_profile_band: str
+    selected_profile_label: str
+    selected_cash_ceiling: float
+    selected_profile_compatible: bool
+    effective_profile_band: str | None = None
+    effective_profile_label: str | None = None
+    effective_cash_ceiling: float | None = None
+    profile_adjusted: bool = False
+    user_action: str
+
+
+class ScoringPolicyTrace(BaseModel):
+    """Internal record of how questionnaire answers mapped to a profile."""
+
+    method: str
+    capacity_score: float | None = None
+    tolerance_score: float | None = None
+    final_score_before_caps: float
+    final_score_after_caps: float
+    draft_profile_band: str
+    draft_profile_label: str
+    final_profile_band: str
+    final_profile_label: str
+    applied_caps: list[str] = Field(default_factory=list)
+    manual_override_used: bool = False
+    manual_override_band: str | None = None
+    manual_override_label: str | None = None
+    section_scores: dict[str, float] = Field(default_factory=dict)
+    question_scores: dict[str, float] = Field(default_factory=dict)
+
+
 class DecisionTrace(BaseModel):
     """Internal facts used to defend how one recommendation was produced.
 
@@ -201,6 +257,7 @@ class DecisionTrace(BaseModel):
     weight_bounds: list[float]
     single_asset_cap: float
     covariance_psd_repair_enabled: bool
+    applied_overlays: list[str] = Field(default_factory=list)
     super_class_minima: dict[str, float]
     super_class_maxima: dict[str, float]
     metric_minima: dict[str, float]
@@ -208,6 +265,9 @@ class DecisionTrace(BaseModel):
     captured_answers: list[CapturedAnswerTrace]
     captured_but_not_used: list[str]
     limitations: list[str]
+    scoring_policy_trace: ScoringPolicyTrace | None = None
+    liquidity_policy_check: LiquidityPolicyCheckTrace | None = None
+    risk_reality_check: RiskRealityCheckTrace | None = None
 
 
 #

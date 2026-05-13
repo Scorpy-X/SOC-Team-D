@@ -1,5 +1,6 @@
 .env
 .vscode/
+.pytest_cache/
 __pycache__/
 *.pyc
 *.db
@@ -9,6 +10,6 @@ frontend/dist/
 /package-lock.json
 tmp/
 data/reports/
+data/validation/
 third_party/PyPortfolioOpt/
-.chainlit/
 .files/

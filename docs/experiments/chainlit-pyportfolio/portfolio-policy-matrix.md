@@ -1,10 +1,10 @@
 # Portfolio Policy Matrix
 
-This note explains the current active Variant B policy in plain English.
+This note explains the current active liquidity-aware profile policy in plain English.
 
 Source of truth:
 
-- `config/portfolio/v2.json`
+- `config/portfolio/v3.json`
 
 The main backend functions connected to this file are:
 
@@ -21,29 +21,29 @@ In other words:
 - the band says what type of investor we are simulating
 - the portfolio policy says what ranges are allowed for that band
 
-## Current Variant B policy by band
+## Current profile policy by band
 
 | Band | Cash | Fixed Income | Equity | Fund | Plain-English meaning |
 |------------|------------|------------|------------|------------|------------|
-| Very Conservative | 20-30% | 60-70% | 0-10% | 0% | Highest stability tilt |
-| Conservative | 10-20% | 50-60% | 20-30% | 0% | Stability first, some equity room |
-| Balanced | 5-10% | 35-50% | 40-60% | 0% | Middle-ground profile |
-| Growth | 0-10% | 10-30% | 60-80% | 0% | Clear growth tilt |
-| Aggressive | 0-5% | 0-15% | 85-100% | 0% | Highest equity tilt |
+| Very Conservative | 15-35% | 55-80% | 0-20% | 0-10% | Highest stability tilt |
+| Conservative | 10-30% | 45-70% | 15-35% | 0-10% | Stability first, some equity room |
+| Balanced | 5-20% | 25-55% | 35-65% | 0-15% | Middle-ground profile |
+| Growth | 0-15% | 10-40% | 50-85% | 0-15% | Clear growth tilt |
+| Aggressive | 0-10% | 0-25% | 70-100% | 0-20% | Highest equity tilt |
 
 Technical note:
 
-- every band also keeps a `40%` single-asset cap
+- every band keeps a `40%` single-asset cap
+- the Cash minimum can be raised by the liquidity check before optimization
 - that cap is a solver safeguard, not the main investor-policy story
 
-## What is no longer active in Variant B
+## What is not active yet
 
 The active policy path does **not** use:
 
-- answer-based overlays
+- broad answer-based overlays beyond the Cash liquidity check
 - income-yield floors
 - duration caps
-- answer-driven cash adjustments
 - answer-driven equity adjustments
 
 Those ideas belonged to the older exploratory policy path.
@@ -100,4 +100,4 @@ The backend returns:
 
 Good answer:
 
-"The selected investor band defines the allowed class ranges. The optimizer is only used to choose the best holdings inside those ranges."
+"The selected investor profile defines the allowed class ranges. The liquidity answers can raise the minimum Cash allocation or push the user toward a safer compatible profile. The optimizer is only used to choose holdings inside those approved constraints."

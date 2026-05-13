@@ -1,76 +1,64 @@
-# Chainlit Prototype Snapshot
+# Chainlit Advisor Prototype Snapshot
 
-This note explains what changed in the Week 5 Team D snapshot.
+This note records the Week 6 Chainlit advisor snapshot promoted into `SOC Team D`.
 
 ## What Was Brought In
 
-The Week 5 snapshot brings over the latest advisor/reporting work from
-`SOC exp`, including:
+The Week 6 snapshot brings in the current advisor/reporting system:
 
-- local HTML report generation after Chainlit submission
-- a polished user-facing portfolio report
-- a technical audit report with decision trace details
-- optional OpenAI-assisted prose rewriting with deterministic fallback
-- a shorter final chatbot response that points to the detailed report
-- updated tests for report generation and report prose fallback behavior
+- questionnaire-driven investor profile scoring
+- typed money amount capture with `yes` confirmation
+- automatic liquidity compatibility check
+- automatic adjustment to the nearest safer compatible profile when needed
+- volatility notice before report generation
+- constrained PyPortfolioOpt allocation using portfolio policy `v3`
+- compact final chat summary with key metrics and grouped holdings
+- user-facing HTML portfolio report
+- technical audit report with decision trace and formula trail
+- sample report generation for all five investor profiles
+- advisor-flow and optimizer validation runners
 
-## What Changed For A Reader Or Demo User
+## What Changed Since Week 5
 
-Compared with Week 4:
+Week 5 focused on generating user and audit reports after the chat result.
 
-- the chatbot no longer tries to show every detail in the final message
-- the user receives a cleaner HTML report for the detailed portfolio explanation
-- report wording is more client-facing, using terms such as asset code and investment type
-- technical details such as sensitivity values are kept in the audit report instead of the user report
-- generated reports are saved locally under `data/reports/`
+Week 6 moves the prototype further toward a defensible advisory workflow:
 
-## What Was Replaced
+- the questionnaire now calculates the investor profile
+- liquidity inputs now affect Cash reserve compatibility
+- the system no longer treats liquidity as display-only
+- profile adjustment is disclosed instead of hidden
+- validation evidence is separated into advisor-flow validation and optimizer validation
+- the README now explains scoring, liquidity, constraints, PyPortfolioOpt usage, and validation in one place
 
-The main Week 4 repo story was replaced because it did not describe the new
-reporting layer.
+## Active Technical Configuration
 
-That includes:
-
-- the root `README.md`
-- the visible submission summary
-- this prototype snapshot note
-- the experiment overview docs that still described the older chat-only final output
+- questionnaire: `config/questionnaires/v4.json`
+- scoring: `config/scoring/v5.json`
+- portfolio policy: `config/portfolio/v3.json`
+- primary launcher: `Run Chainlit Experiment.cmd`
+- validation launchers:
+  - `Run Advisor Flow Validation.cmd`
+  - `Run Optimizer Validation.cmd`
+  - `Run Sample Investor Reports.cmd`
 
 ## What Was Kept
 
-These were intentionally preserved:
+These areas were preserved as part of the curated submission:
 
 - `frontend/`
 - `notebooks/`
 - `data/exports/`
-- the frontend demo launchers
-- Week 2 submission material
-- archived Week 3 and Week 4 submission material
+- Week 2, Week 3, Week 4, and Week 5 submission material
+- archived README and snapshot notes
 
-The older material remains useful as project history and evidence.
+Generated reports, validation logs, local databases, `.env`, virtual
+environments, and temporary files are intentionally excluded.
 
-## Current Technical Note
+## Current Limits To State Clearly
 
-Current active configuration:
-
-- questionnaire: `config/questionnaires/v3.json`
-- scoring fallback: `config/scoring/v4.json`
-- portfolio policy: `config/portfolio/v2.json`
-
-Current live behavior:
-
-1. collect questionnaire answers in the chat
-2. confirm money amounts before saving them
-3. let the user review and edit answers
-4. let the user choose a draft investor profile
-5. build a sample portfolio inside the allowed policy ranges
-6. generate a user HTML report and a technical audit report
-
-## Current Limits To Keep Stating
-
-- the draft investor profile is still chosen manually
-- the questionnaire does not yet assign the final profile automatically
-- money amount answers do not yet change the portfolio recommendation
-- free-text narrative answers are still deferred
-- the system is still an exploratory prototype, not a finished production advisory product
-- OpenAI, when enabled, is only a prose assistant and does not make portfolio decisions
+- this is still a prototype, not final regulated financial advice
+- expected returns are estimates, not guarantees
+- the volatility notice is a simple stress estimate, not a formal risk model
+- final investment policy still needs wider review and approval
+- optional OpenAI support is limited to prose rewriting only

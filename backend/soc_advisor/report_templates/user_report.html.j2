@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Draft Portfolio Report</title>
+  <title>Portfolio Report</title>
   {% include "_styles.html.j2" %}
 </head>
 <body>
   <main>
     <header class="hero">
       <div>
-        <div class="eyebrow">Draft portfolio report</div>
+        <div class="eyebrow">Prepared for review</div>
         <h1>{{ report.profile.profile_label }} portfolio report</h1>
         <p>{{ report.prose.executive_summary }}</p>
       </div>
@@ -23,6 +23,16 @@
           <span>Recommendation basis</span>
           <strong>{{ report.recommendation_basis_label }}</strong>
         </div>
+        {% if report.scoring_policy_trace %}
+        <div class="hero-metric">
+          <span>Risk score</span>
+          <strong>{{ report.scoring_policy_trace.displayed_risk_score }}</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Investor type</span>
+          <strong>{{ report.scoring_policy_trace.displayed_investor_type }}</strong>
+        </div>
+        {% endif %}
         <div class="hero-metric">
           <span>Generated</span>
           <strong>{{ report.generated_at_label }}</strong>
@@ -62,9 +72,25 @@
       </div>
     </section>
 
+    {% if report.profile_explanation_lines %}
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Recommendation basis</div>
+        <h2>Why this investor profile was used.</h2>
+      </div>
+      <div class="panel">
+        <ul class="note-list">
+          {% for line in report.profile_explanation_lines %}
+          <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+    {% endif %}
+
     <section>
       <div class="eyebrow">Metrics</div>
-      <h2>Key estimates in plain language.</h2>
+      <h2>Key portfolio metrics.</h2>
       <div class="metric-grid">
         {% for metric in report.metrics %}
         <div class="metric">
@@ -173,9 +199,57 @@
       </div>
     </section>
 
+    {% if report.risk_reality_check %}
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Risk reality check</div>
+        <h2>A plain-language stress estimate.</h2>
+      </div>
+      <div class="panel">
+        <p>
+          Before this report was generated, the system showed a rough volatility stress estimate based on the proposed portfolio's annual volatility.
+          The estimate used annual volatility of {{ report.risk_reality_check.annual_volatility }} and showed a potential portfolio loss of {{ report.risk_reality_check.stress_percent }} under that stress estimate.
+          {% if report.risk_reality_check.stress_amount %}
+          On the portfolio value provided, that potential loss is about {{ report.risk_reality_check.stress_amount }}.
+          {% endif %}
+        </p>
+        <p>
+          This simplified estimate supports the review conversation. It is not a prediction, formal risk model, or guaranteed limit.
+        </p>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if report.liquidity_policy_check %}
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Liquidity check</div>
+        <h2>Cash needs were checked before the report.</h2>
+      </div>
+      <div class="panel">
+        <p>
+          Before building this report, the system checked whether the selected profile could support the near-term Cash need from your answers.
+          The estimated Cash reserve was {{ report.liquidity_policy_check.required_liquidity_amount }}, or {{ report.liquidity_policy_check.liquidity_floor }} of the portfolio value entered.
+        </p>
+        {% if report.liquidity_explanation_lines %}
+        <ul class="note-list">
+          {% for line in report.liquidity_explanation_lines %}
+          <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if report.liquidity_policy_check.profile_adjusted == "Yes" %}
+        <p>
+          The selected profile was adjusted to {{ report.liquidity_policy_check.effective_profile }} because the original profile did not allow enough Cash for that liquidity need.
+        </p>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
+
     <section>
       <div class="eyebrow">Full investment list</div>
-      <h2>All investments included in this draft portfolio.</h2>
+      <h2>All investments included in this proposed portfolio.</h2>
       <table>
         <thead>
           <tr>
@@ -187,7 +261,7 @@
             <th>Estimated amount</th>
             <th>Estimated yearly return</th>
             <th>Estimated income</th>
-            <th>Expected yearly movement</th>
+            <th>Annual volatility</th>
           </tr>
         </thead>
         <tbody>

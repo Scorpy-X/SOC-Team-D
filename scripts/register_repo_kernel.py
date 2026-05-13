@@ -1,4 +1,4 @@
-"""Register the repo-local Jupyter kernel for SOC Team D."""
+"""Register the repo-local Jupyter kernel for SOC exp."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import subprocess
 import sys
 
 
-KERNEL_NAME = "soc-team-d-py312"
-DISPLAY_NAME = f"Python {sys.version_info.major}.{sys.version_info.minor} (SOC Team D)"
+KERNEL_NAME = "soc-exp-py312"
+DISPLAY_NAME = f"Python {sys.version_info.major}.{sys.version_info.minor} (SOC exp)"
 
 
 def main() -> int:

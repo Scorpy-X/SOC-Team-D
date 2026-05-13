@@ -77,7 +77,7 @@ Current active contents:
 
 From:
 
-- `config/portfolio/v2.json`
+- `config/portfolio/v3.json`
 
 Current example:
 

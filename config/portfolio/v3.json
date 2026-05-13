@@ -1,0 +1,117 @@
+{
+  "version": "v3",
+  "name": "Liquidity-aware four-superclass allocation defaults",
+  "band_order": [
+    "very_conservative",
+    "conservative",
+    "balanced",
+    "growth",
+    "aggressive"
+  ],
+  "optimizer": {
+    "objective": "max_sharpe",
+    "risk_free_rate": 0.0,
+    "weight_bounds": [0.0, 0.4],
+    "repair_nonpositive_semidefinite": true
+  },
+  "fallback": {
+    "retry_without_overlays": false
+  },
+  "bands": {
+    "very_conservative": {
+      "label": "Very Conservative",
+      "description": "Capital-preservation profile with the strongest cash and fixed-income anchor and only a limited growth allowance.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.15,
+        "Fixed Income": 0.55,
+        "Equity": 0.0,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.35,
+        "Fixed Income": 0.8,
+        "Equity": 0.2,
+        "Fund": 0.1
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "conservative": {
+      "label": "Conservative",
+      "description": "Stability-first profile with fixed income as the main anchor and a modest allowance for growth assets.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.1,
+        "Fixed Income": 0.45,
+        "Equity": 0.15,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.3,
+        "Fixed Income": 0.7,
+        "Equity": 0.35,
+        "Fund": 0.1
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "balanced": {
+      "label": "Balanced",
+      "description": "Middle-ground profile that balances a stabilizing fixed-income sleeve with meaningful growth exposure.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.05,
+        "Fixed Income": 0.25,
+        "Equity": 0.35,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.2,
+        "Fixed Income": 0.55,
+        "Equity": 0.65,
+        "Fund": 0.15
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "growth": {
+      "label": "Growth",
+      "description": "Growth-oriented profile where equity is the main allocation while fixed income and cash remain available for balance.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.0,
+        "Fixed Income": 0.1,
+        "Equity": 0.5,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.15,
+        "Fixed Income": 0.4,
+        "Equity": 0.85,
+        "Fund": 0.15
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    },
+    "aggressive": {
+      "label": "Aggressive",
+      "description": "Highest-growth profile, allowing equity to dominate while preserving only small optional stability sleeves.",
+      "single_asset_cap": 0.4,
+      "min_super_class": {
+        "Cash": 0.0,
+        "Fixed Income": 0.0,
+        "Equity": 0.7,
+        "Fund": 0.0
+      },
+      "max_super_class": {
+        "Cash": 0.1,
+        "Fixed Income": 0.25,
+        "Equity": 1.0,
+        "Fund": 0.2
+      },
+      "min_metrics": {},
+      "max_metrics": {}
+    }
+  }
+}

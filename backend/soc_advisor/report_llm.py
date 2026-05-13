@@ -46,19 +46,20 @@ def build_deterministic_report_prose(facts: Mapping[str, Any]) -> ReportProse:
 
     return ReportProse(
         executive_summary=(
-            f"This draft demo report shows a {profile['profile_label']} portfolio. "
-            "It summarizes the suggested investment mix, key portfolio estimates, "
-            "and the investments included in this draft portfolio."
+            f"This report presents a proposed {profile['profile_label']} allocation. "
+            "It summarizes the recommended investment mix, key portfolio estimates, "
+            "and the investments included for review."
         ),
         allocation_explanation=(
-            f"The current mix is {class_mix}. The estimated yearly return is "
-            f"{metrics['expected_return']} and the expected yearly movement is "
+            f"The current allocation is {class_mix}. The expected annual return is "
+            f"{metrics['expected_return']} and the annual volatility is "
             f"{metrics['volatility']}. Currency exposure is {currency_mix}."
         ),
         limitation_note=(
-            "This is a draft demo report. Some questionnaire inputs are captured "
-            "but not yet used to build the portfolio, and expected returns are "
-            "estimates rather than guarantees."
+            "This SOC advisor prototype report is prepared for review and is not "
+            "final regulated financial advice. The liquidity answers are used for "
+            "a Cash reserve check, but the full suitability model is still under "
+            "development. Expected returns are estimates rather than guarantees."
         ),
         status="deterministic",
     )
@@ -134,7 +135,7 @@ def build_report_prose(facts: Mapping[str, Any]) -> ReportProse:
                 "Do not calculate new metrics. Do not change weights, holdings, "
                 "profile bands, constraints, or limitations. Do not give guarantees. "
                 "Use client-facing language and avoid backend terms such as optimizer, "
-                "mock-band, dataframe, CSV, API, ticker, and profile source. "
+                "mock-band, dataframe, CSV, API, ticker, profile source, draft, and demo. "
                 "Return only JSON with keys: executive_summary, allocation_explanation, limitation_note."
             ),
             input=json.dumps(

@@ -1,0 +1,384 @@
+{
+  "version": "v4",
+  "title": "Risk Profiling Questionnaire",
+  "description": "DOCX-aligned typed questionnaire for liquidity capture and automatic investor-profile scoring. Liquidity answers are handled separately from risk scoring.",
+  "questions": [
+    {
+      "id": "portfolio_value",
+      "order": 1,
+      "text": "How much are you investing in this portfolio today? The minimum portfolio value for this questionnaire is $25,000.",
+      "help_text": "You can type a plain number or include a dollar sign and commas, for example: $50,000.",
+      "type": "currency_amount",
+      "dimension": "liquidity",
+      "required": true,
+      "used_for_scoring": false,
+      "validation": {
+        "min_value": 25000,
+        "example": "$50,000"
+      },
+      "options": []
+    },
+    {
+      "id": "major_expense_withdrawal_amount",
+      "order": 2,
+      "text": "How much might you need to withdraw for a major expense in the next 12 to 24 months?",
+      "help_text": "Use 0 if no major withdrawal is expected.",
+      "type": "currency_amount",
+      "dimension": "liquidity",
+      "required": true,
+      "used_for_scoring": false,
+      "validation": {
+        "min_value": 0,
+        "example": "$10,000"
+      },
+      "options": []
+    },
+    {
+      "id": "essential_monthly_expenses",
+      "order": 3,
+      "text": "What are your estimated essential monthly expenses?",
+      "help_text": "This helps estimate the Cash amount that should remain available for near-term liquidity.",
+      "type": "currency_amount",
+      "dimension": "liquidity",
+      "required": true,
+      "used_for_scoring": false,
+      "validation": {
+        "min_value": 0,
+        "example": "$2,500"
+      },
+      "options": []
+    },
+    {
+      "id": "emergency_fund_months",
+      "order": 4,
+      "text": "How many months of expenses would you like to have set aside for emergencies?",
+      "help_text": "This is used for the liquidity calculation, not the risk-bucket score.",
+      "type": "single_choice",
+      "dimension": "liquidity",
+      "required": true,
+      "used_for_scoring": false,
+      "options": [
+        {
+          "id": "months_0",
+          "label": "0 months",
+          "description": "No separate emergency reserve target."
+        },
+        {
+          "id": "months_1_3",
+          "label": "1-3 months",
+          "description": "Small emergency reserve target."
+        },
+        {
+          "id": "months_4_6",
+          "label": "4-6 months",
+          "description": "Moderate emergency reserve target."
+        },
+        {
+          "id": "months_6_plus",
+          "label": "More than 6 months",
+          "description": "Large emergency reserve target."
+        }
+      ]
+    },
+    {
+      "id": "current_emergency_fund_months",
+      "order": 5,
+      "text": "How many months of expenses have you currently set aside for emergencies?",
+      "help_text": "This is a risk-capacity signal: stronger current reserves generally support more risk capacity.",
+      "type": "single_choice",
+      "dimension": "risk_capacity",
+      "required": true,
+      "options": [
+        {
+          "id": "current_months_0",
+          "label": "0 months",
+          "description": "No current emergency reserve."
+        },
+        {
+          "id": "current_months_1_3",
+          "label": "1-3 months",
+          "description": "Small current emergency reserve."
+        },
+        {
+          "id": "current_months_4_6",
+          "label": "4-6 months",
+          "description": "Moderate current emergency reserve."
+        },
+        {
+          "id": "current_months_6_plus",
+          "label": "More than 6 months",
+          "description": "Strong current emergency reserve."
+        }
+      ]
+    },
+    {
+      "id": "non_investment_income_stability",
+      "order": 6,
+      "text": "How would you describe your non-investment income?",
+      "help_text": "More stable income generally increases the capacity to hold through market volatility.",
+      "type": "single_choice",
+      "dimension": "risk_capacity",
+      "required": true,
+      "options": [
+        {
+          "id": "very_stable",
+          "label": "Very stable",
+          "description": "Stable job or reliable income with high surplus."
+        },
+        {
+          "id": "moderately_stable",
+          "label": "Moderately stable",
+          "description": "Standard employment or moderately predictable income."
+        },
+        {
+          "id": "unstable",
+          "label": "Unstable",
+          "description": "Variable income, commission-based income, or uncertain employment."
+        }
+      ]
+    },
+    {
+      "id": "dependents_obligations",
+      "order": 7,
+      "text": "To what extent do others depend on your income or financial resources for ongoing support?",
+      "help_text": "Higher obligations reduce risk capacity because more people rely on the investor's income.",
+      "type": "single_choice",
+      "dimension": "risk_capacity",
+      "required": true,
+      "options": [
+        {
+          "id": "heavy_dependents",
+          "label": "At least three dependents rely heavily on my income",
+          "description": "I am the sole or main breadwinner for several people."
+        },
+        {
+          "id": "some_dependents",
+          "label": "Two or more people depend on my income",
+          "description": "I have meaningful ongoing support obligations."
+        },
+        {
+          "id": "little_to_none",
+          "label": "I have little to no financial dependence obligations",
+          "description": "Few or no people rely on my income for ongoing support."
+        }
+      ]
+    },
+    {
+      "id": "time_horizon",
+      "order": 8,
+      "text": "When do you expect to need a large amount of money from these investments?",
+      "help_text": "Longer time horizons generally support more risk capacity.",
+      "type": "single_choice",
+      "dimension": "risk_capacity",
+      "required": true,
+      "options": [
+        {
+          "id": "years_5_or_less",
+          "label": "5 years or less",
+          "description": "Short horizon."
+        },
+        {
+          "id": "years_6_to_9",
+          "label": "6 to 9 years",
+          "description": "Medium horizon."
+        },
+        {
+          "id": "years_10_plus",
+          "label": "10 years or more",
+          "description": "Long horizon."
+        }
+      ]
+    },
+    {
+      "id": "investment_phase",
+      "order": 9,
+      "text": "What phase of your investment life would you say you are in?",
+      "help_text": "Accumulation usually supports more risk capacity than drawing from the portfolio.",
+      "type": "single_choice",
+      "dimension": "risk_capacity",
+      "required": true,
+      "options": [
+        {
+          "id": "disbursement",
+          "label": "Capital disbursement",
+          "description": "The portfolio is being used more directly for withdrawals."
+        },
+        {
+          "id": "accumulation",
+          "label": "Capital accumulation",
+          "description": "The portfolio is still mainly for growth."
+        }
+      ]
+    },
+    {
+      "id": "market_drop_response",
+      "order": 10,
+      "text": "If the stock market dropped 25% tomorrow and stayed there for two years, what would you do?",
+      "help_text": "This is the main drawdown-reaction question. Selling everything caps the calculated profile at Balanced.",
+      "type": "single_choice",
+      "dimension": "risk_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "sell_everything",
+          "label": "Sell everything to protect what is left",
+          "description": "Exit the position after a major drop."
+        },
+        {
+          "id": "sell_portion",
+          "label": "Sell a portion and move to a safer investment",
+          "description": "Reduce exposure after the drop."
+        },
+        {
+          "id": "stay_invested",
+          "label": "Do nothing / stay invested",
+          "description": "Hold the portfolio through the decline."
+        },
+        {
+          "id": "invest_more",
+          "label": "Invest more to take advantage of lower prices",
+          "description": "Add capital after the drop."
+        }
+      ]
+    },
+    {
+      "id": "short_term_loss_willingness",
+      "order": 11,
+      "text": "How willing are you to accept short-term losses for potential long-term gain?",
+      "help_text": "This captures return-seeking preference and comfort with temporary losses.",
+      "type": "single_choice",
+      "dimension": "risk_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "very_willing",
+          "label": "Very willing",
+          "description": "Very comfortable with short-term losses."
+        },
+        {
+          "id": "willing",
+          "label": "Willing",
+          "description": "Comfortable with some losses for long-term gain."
+        },
+        {
+          "id": "indifferent",
+          "label": "Indifferent",
+          "description": "Neutral on short-term losses versus long-term gain."
+        },
+        {
+          "id": "unwilling",
+          "label": "Unwilling",
+          "description": "Prefers to avoid short-term losses."
+        },
+        {
+          "id": "very_unwilling",
+          "label": "Very unwilling",
+          "description": "Strongly prefers to avoid short-term losses."
+        }
+      ]
+    },
+    {
+      "id": "financial_knowledge",
+      "order": 12,
+      "text": "How knowledgeable are you about financial and investment concepts?",
+      "help_text": "This is treated as a behavioural-consistency support signal, not a guarantee of discipline.",
+      "type": "single_choice",
+      "dimension": "risk_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "limited_knowledge",
+          "label": "Limited investment knowledge",
+          "description": "Very limited familiarity with finance and investing."
+        },
+        {
+          "id": "basic_understanding",
+          "label": "Basic investment understanding",
+          "description": "Some familiarity, but still limited."
+        },
+        {
+          "id": "moderate_understanding",
+          "label": "Moderate investment understanding",
+          "description": "Comfortable with common investing ideas."
+        },
+        {
+          "id": "competent_understanding",
+          "label": "Competent investment understanding",
+          "description": "Strong practical understanding."
+        },
+        {
+          "id": "advanced_knowledge",
+          "label": "Advanced investment knowledge",
+          "description": "Very comfortable with financial concepts."
+        }
+      ]
+    },
+    {
+      "id": "investing_experience_length",
+      "order": 13,
+      "text": "How long have you been investing?",
+      "help_text": "This is also treated as a behavioural-consistency support signal.",
+      "type": "single_choice",
+      "dimension": "risk_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "lt_1_year",
+          "label": "Less than a year",
+          "description": "Very limited investing experience."
+        },
+        {
+          "id": "years_1_3",
+          "label": "1-3 years",
+          "description": "Early hands-on investing experience."
+        },
+        {
+          "id": "years_4_10",
+          "label": "4-10 years",
+          "description": "Moderate investing experience."
+        },
+        {
+          "id": "years_10_plus",
+          "label": "More than 10 years",
+          "description": "Long investing history."
+        }
+      ]
+    },
+    {
+      "id": "hypothetical_30_loss_reaction",
+      "order": 14,
+      "text": "An investor chooses a portfolio expected to produce higher long-term returns but with larger temporary declines. Six months later, the portfolio falls by 30% during a market downturn. What would you think?",
+      "help_text": "This captures loss aversion in a scenario that every user can answer, even without prior investing experience.",
+      "type": "single_choice",
+      "dimension": "risk_tolerance",
+      "required": true,
+      "options": [
+        {
+          "id": "move_safer_before_worse",
+          "label": "I should move to safer investments before losses worsen.",
+          "description": "Strong loss-aversion response."
+        },
+        {
+          "id": "took_too_much_risk",
+          "label": "I may have taken more risk than I am comfortable with.",
+          "description": "Moderate loss-aversion response."
+        },
+        {
+          "id": "declines_expected",
+          "label": "Market declines are uncomfortable but expected.",
+          "description": "Accepts that declines can happen."
+        },
+        {
+          "id": "plan_unchanged",
+          "label": "My long-term plan remains unchanged.",
+          "description": "Maintains discipline through the decline."
+        },
+        {
+          "id": "opportunity_invest_more",
+          "label": "This may be an opportunity to invest more.",
+          "description": "Sees the decline as a buying opportunity."
+        }
+      ]
+    }
+  ]
+}

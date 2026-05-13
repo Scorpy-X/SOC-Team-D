@@ -1,0 +1,185 @@
+{
+  "version": "v5",
+  "name": "DOCX-aligned weighted normalized scoring for questionnaire v4",
+  "method": "weighted_normalized_sections",
+  "section_weights": {
+    "risk_capacity": 0.60,
+    "risk_tolerance": 0.40
+  },
+  "sections": {
+    "risk_capacity": {
+      "label": "Risk Capacity",
+      "questions": {
+        "current_emergency_fund_months": 0.20,
+        "non_investment_income_stability": 0.30,
+        "dependents_obligations": 0.15,
+        "time_horizon": 0.35,
+        "investment_phase": 0.35
+      }
+    },
+    "risk_tolerance": {
+      "label": "Risk Tolerance",
+      "questions": {
+        "market_drop_response": 0.40,
+        "short_term_loss_willingness": 0.15,
+        "financial_knowledge": 0.15,
+        "investing_experience_length": 0.15,
+        "hypothetical_30_loss_reaction": 0.25
+      }
+    }
+  },
+  "question_scores": {
+    "current_emergency_fund_months": {
+      "current_months_0": 0.0,
+      "current_months_1_3": 0.333333,
+      "current_months_4_6": 0.666667,
+      "current_months_6_plus": 1.0
+    },
+    "non_investment_income_stability": {
+      "unstable": 0.0,
+      "moderately_stable": 0.5,
+      "very_stable": 1.0
+    },
+    "dependents_obligations": {
+      "heavy_dependents": 0.0,
+      "some_dependents": 0.5,
+      "little_to_none": 1.0
+    },
+    "time_horizon": {
+      "years_5_or_less": 0.0,
+      "years_6_to_9": 0.5,
+      "years_10_plus": 1.0
+    },
+    "investment_phase": {
+      "disbursement": 0.0,
+      "accumulation": 1.0
+    },
+    "market_drop_response": {
+      "sell_everything": 0.0,
+      "sell_portion": 0.333333,
+      "stay_invested": 0.666667,
+      "invest_more": 1.0
+    },
+    "short_term_loss_willingness": {
+      "very_unwilling": 0.0,
+      "unwilling": 0.25,
+      "indifferent": 0.5,
+      "willing": 0.75,
+      "very_willing": 1.0
+    },
+    "financial_knowledge": {
+      "limited_knowledge": 0.0,
+      "basic_understanding": 0.25,
+      "moderate_understanding": 0.5,
+      "competent_understanding": 0.75,
+      "advanced_knowledge": 1.0
+    },
+    "investing_experience_length": {
+      "lt_1_year": 0.0,
+      "years_1_3": 0.333333,
+      "years_4_10": 0.666667,
+      "years_10_plus": 1.0
+    },
+    "hypothetical_30_loss_reaction": {
+      "move_safer_before_worse": 0.0,
+      "took_too_much_risk": 0.25,
+      "declines_expected": 0.5,
+      "plan_unchanged": 0.75,
+      "opportunity_invest_more": 1.0
+    }
+  },
+  "cap_rules": [
+    {
+      "id": "sell_everything_caps_at_balanced",
+      "question_id": "market_drop_response",
+      "option_ids": [
+        "sell_everything"
+      ],
+      "max_profile_band": "balanced",
+      "text": "Selling everything after a severe market drop caps the calculated profile at Balanced."
+    }
+  ],
+  "profile_bands": [
+    {
+      "id": "very_conservative",
+      "label": "Very Conservative",
+      "min_score": 0.0,
+      "max_score": 0.2,
+      "description": "The questionnaire score points strongly toward preserving capital and limiting portfolio movement."
+    },
+    {
+      "id": "conservative",
+      "label": "Conservative",
+      "min_score": 0.2,
+      "max_score": 0.4,
+      "description": "The questionnaire score supports a cautious allocation with meaningful stability."
+    },
+    {
+      "id": "balanced",
+      "label": "Balanced",
+      "min_score": 0.4,
+      "max_score": 0.6,
+      "description": "The questionnaire score supports a mixed profile that balances stability and growth."
+    },
+    {
+      "id": "growth",
+      "label": "Growth",
+      "min_score": 0.6,
+      "max_score": 0.8,
+      "description": "The questionnaire score supports a growth-oriented profile."
+    },
+    {
+      "id": "aggressive",
+      "label": "Aggressive",
+      "min_score": 0.8,
+      "max_score": 1.0,
+      "description": "The questionnaire score supports the highest growth profile in the current policy."
+    }
+  ],
+  "reason_rules": [
+    {
+      "question_id": "time_horizon",
+      "option_ids": [
+        "years_10_plus"
+      ],
+      "text": "A longer time horizon generally supports greater risk capacity."
+    },
+    {
+      "question_id": "time_horizon",
+      "option_ids": [
+        "years_5_or_less"
+      ],
+      "text": "A shorter time horizon generally pushes the profile toward more stability."
+    },
+    {
+      "question_id": "non_investment_income_stability",
+      "option_ids": [
+        "unstable"
+      ],
+      "text": "Less stable non-investment income reduces the capacity to absorb portfolio volatility."
+    },
+    {
+      "question_id": "market_drop_response",
+      "option_ids": [
+        "sell_everything"
+      ],
+      "text": "Selling everything after a severe drop is treated as a hard cap at Balanced."
+    },
+    {
+      "question_id": "short_term_loss_willingness",
+      "option_ids": [
+        "very_willing",
+        "willing"
+      ],
+      "text": "Greater willingness to accept temporary losses supports a more growth-oriented profile."
+    },
+    {
+      "question_id": "hypothetical_30_loss_reaction",
+      "option_ids": [
+        "plan_unchanged",
+        "opportunity_invest_more"
+      ],
+      "text": "The 30% decline response suggests stronger ability to stay disciplined during volatility."
+    }
+  ]
+}

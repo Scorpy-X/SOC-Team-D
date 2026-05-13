@@ -1,19 +1,21 @@
 <style>
   :root {
-    --ink: #17201b;
-    --muted: #667168;
-    --paper: #f7f2e8;
-    --panel: #fffaf1;
-    --line: #ded4c2;
-    --accent: #b96a3c;
-    --cash: #9aa44d;
-    --fixed-income: #2f6771;
-    --equity: #c86b35;
-    --fund: #6d6a4b;
-    --other: #8b9088;
+    --ink: #15253a;
+    --muted: #5f7088;
+    --paper: #f3f8fc;
+    --panel: rgba(255, 255, 255, 0.76);
+    --line: #d5e0ee;
+    --accent: #4d9ae0;
+    --accent-strong: #3278c2;
+    --cash: #8ca96b;
+    --fixed-income: #4d7ba8;
+    --equity: #4b90d8;
+    --fund: #75a9db;
+    --other: #8c91a8;
     --body-font: "Aptos", "Segoe UI Variable Text", "Segoe UI", sans-serif;
     --heading-font: "Aptos Display", "Segoe UI Variable Display", "Bahnschrift", "Aptos", sans-serif;
     --number-font: "Cascadia Mono", "Consolas", "Segoe UI Mono", monospace;
+    --panel-shadow: 0 20px 46px rgba(28, 58, 92, 0.12);
   }
 
   * {
@@ -24,8 +26,9 @@
     margin: 0;
     color: var(--ink);
     background:
-      radial-gradient(circle at 12% 4%, rgba(200, 107, 53, 0.20), transparent 26rem),
-      linear-gradient(140deg, #f8f0df 0%, #efe3cf 48%, #f6f1e8 100%);
+      radial-gradient(circle at 10% 4%, rgba(95, 166, 224, 0.16), transparent 28rem),
+      radial-gradient(circle at 88% 0%, rgba(150, 203, 241, 0.14), transparent 20rem),
+      linear-gradient(140deg, #f7fbff 0%, #edf5fb 48%, #f3f8fc 100%);
     font-family: var(--body-font);
     line-height: 1.5;
   }
@@ -43,16 +46,18 @@
     min-height: 320px;
     align-items: end;
     padding: 48px;
-    border: 1px solid rgba(24, 32, 27, 0.16);
+    border: 1px solid rgba(197, 220, 241, 0.3);
     background:
-      linear-gradient(115deg, rgba(24, 32, 27, 0.94), rgba(24, 32, 27, 0.78)),
+      radial-gradient(circle at top right, rgba(112, 183, 235, 0.18), transparent 15rem),
+      linear-gradient(115deg, rgba(16, 34, 56, 0.96), rgba(31, 60, 92, 0.84)),
       repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 48px);
-    color: #fff8e8;
+    color: #f4fbff;
     border-radius: 32px;
+    box-shadow: 0 26px 70px rgba(16, 34, 56, 0.2);
   }
 
   .eyebrow {
-    color: #d8b98e;
+    color: #c6e1f8;
     font: 700 0.74rem/1.2 var(--body-font);
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -92,7 +97,7 @@
   }
 
   .hero-side {
-    border-left: 1px solid rgba(255, 248, 232, 0.22);
+    border-left: 1px solid rgba(248, 244, 255, 0.18);
     padding-left: 28px;
   }
 
@@ -110,7 +115,7 @@
 
   .hero-metric strong {
     display: block;
-    color: #fff8e8;
+    color: #f4fbff;
     font-family: var(--heading-font);
     font-size: 1.45rem;
     font-weight: 650;
@@ -131,7 +136,9 @@
     padding: 26px;
     border: 1px solid var(--line);
     border-radius: 24px;
-    background: rgba(255, 250, 240, 0.74);
+    background: var(--panel);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(10px);
   }
 
   .panel-subtle {
@@ -144,8 +151,8 @@
     height: 44px;
     overflow: hidden;
     border-radius: 999px;
-    border: 1px solid rgba(24, 32, 27, 0.18);
-    background: #e1d4bf;
+    border: 1px solid rgba(77, 154, 224, 0.16);
+    background: #dfedf8;
   }
 
   .segment {
@@ -225,7 +232,7 @@
     gap: 18px;
     align-items: center;
     padding: 14px 0;
-    border-top: 1px solid rgba(222, 212, 194, 0.7);
+    border-top: 1px solid rgba(213, 224, 238, 0.82);
   }
 
   .holding-row:first-child {
@@ -237,10 +244,10 @@
     display: inline-flex;
     width: fit-content;
     align-items: center;
-    border: 1px solid rgba(23, 32, 27, 0.18);
+    border: 1px solid rgba(77, 154, 224, 0.18);
     border-radius: 999px;
     padding: 5px 10px;
-    background: rgba(255, 250, 241, 0.86);
+    background: rgba(77, 154, 224, 0.08);
     font-family: var(--number-font);
     font-size: 0.84rem;
     font-weight: 700;
@@ -269,14 +276,14 @@
   .mini-bar {
     height: 10px;
     border-radius: 999px;
-    background: #e0d4c0;
+    background: #dfedf8;
     overflow: hidden;
   }
 
   .mini-fill {
     height: 100%;
     border-radius: 999px;
-    background: var(--ink);
+    background: linear-gradient(90deg, var(--accent), var(--accent-strong));
   }
 
   table {
@@ -309,8 +316,8 @@
   }
 
   .audit {
-    background: #191f1a;
-    color: #f7eddb;
+    background: #132235;
+    color: #f4fbff;
   }
 
   .audit .panel,
@@ -324,8 +331,8 @@
     overflow: auto;
     padding: 20px;
     border-radius: 18px;
-    background: rgba(0, 0, 0, 0.28);
-    color: #fff8e8;
+    background: rgba(12, 28, 46, 0.36);
+    color: #f4fbff;
   }
 
   @media (max-width: 760px) {

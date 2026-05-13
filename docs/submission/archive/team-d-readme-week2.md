@@ -98,7 +98,7 @@ questionnaire draft.
 ## What Was Intentionally Left Out
 
 - assignment brief files and internal drafting documents
-- internal Codex or agent-only repo files
+- internal assistant or agent-only repo files
 - exploratory backend scaffold work that belongs in `SOC exp`
 - extra exploratory notebooks and support files that do not strengthen the Week 2 submission story
 

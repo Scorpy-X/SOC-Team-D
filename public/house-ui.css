@@ -1,0 +1,84 @@
+/*
+  SOC house-ui starter for Chainlit surfaces.
+
+  This file holds reusable visual primitives for the experimental chat shell and
+  custom elements. `chainlit-custom.css` imports this file and applies the more
+  selector-specific overrides on top.
+*/
+
+:root {
+  --soc-shell-shadow: 0 20px 54px rgba(43, 83, 128, 0.14);
+  --soc-panel-shadow: 0 16px 36px rgba(43, 83, 128, 0.1);
+  --soc-border-strong: hsl(var(--border) / 0.84);
+  --soc-border-soft: hsl(var(--border) / 0.52);
+  --soc-body-glow-a: rgba(86, 160, 222, 0.14);
+  --soc-body-glow-b: rgba(188, 220, 246, 0.2);
+  --soc-body-base: linear-gradient(180deg, hsl(var(--background)), hsl(208 45% 95%));
+  --soc-surface-glass:
+    linear-gradient(180deg, hsl(var(--card) / 0.94), hsl(var(--card) / 0.82));
+  --soc-surface-soft:
+    linear-gradient(180deg, hsl(var(--muted) / 0.72), hsl(var(--card) / 0.8));
+  --soc-primary-soft: hsl(var(--primary) / 0.14);
+  --soc-text-soft: hsl(var(--muted-foreground) / 0.96);
+  --soc-submit-shadow: 0 12px 28px rgba(83, 156, 218, 0.22);
+}
+
+html.dark,
+body.dark,
+:root.dark,
+.dark,
+[data-theme="dark"] {
+  --soc-shell-shadow: 0 24px 64px rgba(10, 24, 43, 0.3);
+  --soc-panel-shadow: 0 18px 40px rgba(10, 24, 43, 0.22);
+  --soc-body-glow-a: rgba(87, 163, 224, 0.16);
+  --soc-body-glow-b: rgba(121, 181, 230, 0.1);
+  --soc-body-base: linear-gradient(180deg, hsl(var(--background)), hsl(216 31% 13%));
+  --soc-surface-glass:
+    linear-gradient(180deg, hsl(var(--card) / 0.92), hsl(var(--card) / 0.78));
+  --soc-surface-soft:
+    linear-gradient(180deg, hsl(var(--muted) / 0.7), hsl(var(--card) / 0.72));
+  --soc-submit-shadow: 0 12px 28px rgba(96, 173, 233, 0.28);
+}
+
+.soc-surface-card {
+  border: 1px solid var(--soc-border-strong);
+  background: var(--soc-surface-glass);
+  box-shadow: var(--soc-panel-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.soc-surface-soft {
+  border: 1px solid var(--soc-border-soft);
+  background: var(--soc-surface-soft);
+  box-shadow: var(--soc-panel-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.soc-muted-copy {
+  color: var(--soc-text-soft);
+}
+
+.soc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--soc-border-soft);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: hsl(var(--muted) / 0.56);
+  color: hsl(var(--foreground) / 0.92);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.soc-note-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 760px) {
+  .soc-note-grid.two-up {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

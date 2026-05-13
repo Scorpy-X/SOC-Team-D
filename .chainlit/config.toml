@@ -66,7 +66,16 @@ reaction_on_message_received = false
     # 3. For specific file extensions:
     #    accept = { "application/octet-stream" = [".xyz", ".pdb"] }
     # Note: Using "*/*" is not recommended as it may cause browser warnings
-    accept = ["*/*"]
+    accept = [
+        "text/plain",
+        "text/csv",
+        "application/pdf",
+        "application/json",
+        "text/html",
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+    ]
     max_files = 20
     max_size_mb = 500
 
@@ -97,7 +106,7 @@ reaction_on_message_received = false
 # Name of the assistant.
 name = "SOC Advisor"
 
-# default_theme = "dark"
+default_theme = "dark"
 
 # Force a specific language for all users (e.g., "en-US", "he-IL", "fr-FR")
 # If not set, the browser's language will be used
@@ -134,7 +143,7 @@ custom_css = "/public/chainlit-custom.css"
 # custom_js = "/public/test.js"
 
 # The style of alert boxes. Can be "classic" or "modern".
-alert_style = "classic"
+alert_style = "modern"
 
 # Specify additional attributes for custom JS file
 # custom_js_attributes = "async type = \"module\""

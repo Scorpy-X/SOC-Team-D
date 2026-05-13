@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 from pandas.testing import assert_frame_equal
 import pytest
@@ -20,20 +21,32 @@ from soc_advisor.services import build_manual_mock_profile  # noqa: E402
 
 ORIGINAL_LOAD_PORTFOLIO_FRAMES = portfolio.load_portfolio_frames
 ORIGINAL_LOAD_SNAPSHOT_FRAMES = portfolio.load_snapshot_frames
+ORIGINAL_BUILD_LIVE_RAW_CLIENT = portfolio._build_live_raw_client
 
 
 @pytest.fixture(autouse=True)
 def clear_portfolio_loader_caches() -> None:
     ORIGINAL_LOAD_PORTFOLIO_FRAMES.cache_clear()
     ORIGINAL_LOAD_SNAPSHOT_FRAMES.cache_clear()
+    ORIGINAL_BUILD_LIVE_RAW_CLIENT.cache_clear()
     yield
     ORIGINAL_LOAD_PORTFOLIO_FRAMES.cache_clear()
     ORIGINAL_LOAD_SNAPSHOT_FRAMES.cache_clear()
+    ORIGINAL_BUILD_LIVE_RAW_CLIENT.cache_clear()
 
 
 def _snapshot_pair() -> tuple:
     assets, covariance = ORIGINAL_LOAD_SNAPSHOT_FRAMES()
     return assets.copy(), covariance.copy()
+
+
+def _settings_override(*, data_mode: str, timeout_seconds: float = 3.0):
+    return SimpleNamespace(
+        snapshot_dir=portfolio.settings.snapshot_dir,
+        portfolio_version=portfolio.settings.portfolio_version,
+        portfolio_data_mode=data_mode,
+        soc_api_timeout_seconds=timeout_seconds,
+    )
 
 
 def test_load_portfolio_frames_prefers_live_soc_data(
@@ -46,10 +59,10 @@ def test_load_portfolio_frames_prefers_live_soc_data(
     monkeypatch.setattr(
         portfolio,
         "get_full_assets_df",
-        lambda: live_assets.copy(),
+        lambda **_kwargs: live_assets.copy(),
     )
 
-    def fake_get_asset_covariance_df(*, tickers):
+    def fake_get_asset_covariance_df(*, tickers, **_kwargs):
         requested_tickers[:] = list(tickers)
         return live_covariance.copy()
 
@@ -62,6 +75,11 @@ def test_load_portfolio_frames_prefers_live_soc_data(
         portfolio,
         "load_snapshot_frames",
         lambda: pytest.fail("Snapshot fallback should not be used when live fetch succeeds."),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary"),
     )
 
     caplog.set_level(logging.INFO)
@@ -83,12 +101,17 @@ def test_load_portfolio_frames_falls_back_when_live_fetch_fails(
     monkeypatch.setattr(
         portfolio,
         "get_full_assets_df",
-        lambda: (_ for _ in ()).throw(RuntimeError("live endpoint unavailable")),
+        lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("live endpoint unavailable")),
     )
     monkeypatch.setattr(
         portfolio,
         "load_snapshot_frames",
         lambda: (snapshot_assets, snapshot_covariance),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary"),
     )
 
     caplog.set_level(logging.WARNING)
@@ -110,7 +133,7 @@ def test_load_portfolio_frames_treats_missing_api_key_as_normal_fallback(
     monkeypatch.setattr(
         portfolio,
         "get_full_assets_df",
-        lambda: (_ for _ in ()).throw(
+        lambda **_kwargs: (_ for _ in ()).throw(
             RuntimeError("DIMENSION_DEPTHS_API_KEY is missing.")
         ),
     )
@@ -118,6 +141,11 @@ def test_load_portfolio_frames_treats_missing_api_key_as_normal_fallback(
         portfolio,
         "load_snapshot_frames",
         lambda: (snapshot_assets, snapshot_covariance),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary"),
     )
 
     caplog.set_level(logging.WARNING)
@@ -127,17 +155,94 @@ def test_load_portfolio_frames_treats_missing_api_key_as_normal_fallback(
     assert "DIMENSION_DEPTHS_API_KEY is missing" in caplog.text
 
 
+def test_load_portfolio_frames_csv_only_skips_live_fetch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    snapshot_assets, snapshot_covariance = _snapshot_pair()
+
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="csv_only"),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "get_full_assets_df",
+        lambda: pytest.fail("Live asset fetch should not run in csv_only mode."),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "load_snapshot_frames",
+        lambda: (snapshot_assets, snapshot_covariance),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary"),
+    )
+
+    assets, covariance, source_label = portfolio.load_portfolio_frames()
+
+    assert source_label == "csv_snapshot"
+    assert_frame_equal(assets, snapshot_assets)
+    assert_frame_equal(covariance, snapshot_covariance)
+
+
+def test_load_portfolio_frames_live_only_raises_on_live_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_only"),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "get_full_assets_df",
+        lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("live endpoint unavailable")),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "load_snapshot_frames",
+        lambda: pytest.fail("CSV fallback should not run in live_only mode."),
+    )
+
+    with pytest.raises(RuntimeError, match="live endpoint unavailable"):
+        portfolio.load_portfolio_frames()
+
+
+def test_load_live_raw_client_uses_configured_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[float] = []
+
+    class FakeClient:
+        def __init__(self, *, timeout_seconds: float, **_kwargs):
+            calls.append(timeout_seconds)
+
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary", timeout_seconds=2.5),
+    )
+    monkeypatch.setattr(portfolio, "SocApiRawClient", FakeClient)
+
+    portfolio._build_live_raw_client()
+
+    assert calls == [2.5]
+
+
 def test_load_portfolio_frames_uses_full_snapshot_pair_on_partial_live_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     live_assets, _ = _snapshot_pair()
     snapshot_assets, snapshot_covariance = _snapshot_pair()
 
-    monkeypatch.setattr(portfolio, "get_full_assets_df", lambda: live_assets.copy())
+    monkeypatch.setattr(portfolio, "get_full_assets_df", lambda **_kwargs: live_assets.copy())
     monkeypatch.setattr(
         portfolio,
         "get_asset_covariance_df",
-        lambda *, tickers: (_ for _ in ()).throw(RuntimeError("covariance fetch failed")),
+        lambda *, tickers, **_kwargs: (_ for _ in ()).throw(RuntimeError("covariance fetch failed")),
     )
     monkeypatch.setattr(
         portfolio,
@@ -158,11 +263,16 @@ def test_build_recommendation_succeeds_with_mocked_live_frames(
     live_assets, live_covariance = _snapshot_pair()
     profile = build_manual_mock_profile(profile_band="growth")
 
-    monkeypatch.setattr(portfolio, "get_full_assets_df", lambda: live_assets.copy())
+    monkeypatch.setattr(portfolio, "get_full_assets_df", lambda **_kwargs: live_assets.copy())
     monkeypatch.setattr(
         portfolio,
         "get_asset_covariance_df",
-        lambda *, tickers: live_covariance.copy(),
+        lambda *, tickers, **_kwargs: live_covariance.copy(),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary"),
     )
 
     recommendation = build_recommendation(profile=profile)
@@ -179,7 +289,12 @@ def test_build_recommendation_still_succeeds_with_csv_fallback(
     monkeypatch.setattr(
         portfolio,
         "get_full_assets_df",
-        lambda: (_ for _ in ()).throw(RuntimeError("live API unavailable")),
+        lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("live API unavailable")),
+    )
+    monkeypatch.setattr(
+        portfolio,
+        "settings",
+        _settings_override(data_mode="live_primary"),
     )
 
     recommendation = build_recommendation(profile=profile)

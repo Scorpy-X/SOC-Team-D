@@ -25,11 +25,12 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_DATABASE_PATH = ROOT_DIR / "data" / "soc_advisor.db"
 DEFAULT_DATABASE_URL = f"sqlite:///{DEFAULT_DATABASE_PATH.as_posix()}"
 DATABASE_ENV_KEYS = ("SOC_ADVISOR_DATABASE_URL", "DATABASE_URL")
-DEFAULT_QUESTIONNAIRE_VERSION = "v3"
-DEFAULT_SCORING_VERSION = "v4"
-DEFAULT_PORTFOLIO_VERSION = "v2"
+DEFAULT_QUESTIONNAIRE_VERSION = "v4"
+DEFAULT_SCORING_VERSION = "v5"
+DEFAULT_PORTFOLIO_VERSION = "v3"
 DEFAULT_REPORTS_DIR = ROOT_DIR / "data" / "reports"
 DEFAULT_REPORT_LLM_MODEL = "gpt-5.4-mini"
+DEFAULT_PORTFOLIO_DATA_MODE = "csv_only"
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,8 @@ class AppSettings:
     scoring_dir: Path
     portfolio_dir: Path
     snapshot_dir: Path
+    portfolio_data_mode: str
+    soc_api_timeout_seconds: float
     cors_origins: list[str]
     openai_api_key: str | None
     advisor_report_use_llm: bool
@@ -74,6 +77,16 @@ def _parse_float(raw_value: str | None, *, default: float) -> float:
     if raw_value is None or not raw_value.strip():
         return default
     return float(raw_value)
+
+
+def _parse_portfolio_data_mode(raw_value: str | None) -> str:
+    """Normalize the advisor portfolio data-source mode."""
+
+    normalized = (raw_value or DEFAULT_PORTFOLIO_DATA_MODE).strip().lower()
+    allowed = {"csv_only", "live_primary", "live_only"}
+    if normalized not in allowed:
+        return DEFAULT_PORTFOLIO_DATA_MODE
+    return normalized
 
 
 @lru_cache(maxsize=1)
@@ -109,6 +122,13 @@ def get_settings() -> AppSettings:
         scoring_dir=scoring_dir,
         portfolio_dir=portfolio_dir,
         snapshot_dir=snapshot_dir,
+        portfolio_data_mode=_parse_portfolio_data_mode(
+            os.getenv("PORTFOLIO_DATA_MODE")
+        ),
+        soc_api_timeout_seconds=_parse_float(
+            os.getenv("SOC_API_TIMEOUT_SECONDS"),
+            default=3.0,
+        ),
         cors_origins=_parse_cors_origins(os.getenv("CORS_ORIGINS", "*")),
         openai_api_key=os.getenv("OPENAI_API_KEY") or None,
         advisor_report_use_llm=_parse_bool(os.getenv("ADVISOR_REPORT_USE_LLM")),

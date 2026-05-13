@@ -32,11 +32,15 @@ That order matters.
 - `chat_app.py` is the UI controller that wires the steps together.
 - `main.py` is the thin FastAPI wrapper around the service layer.
 
+If your immediate goal is only to understand the optimizer itself before the
+full app flow, read `bare-pypfopt-demo.md` and run `scripts/demo_bare_pypfopt.py`
+before you dive into `portfolio.py`.
+
 ## The Active Story
 
 The active demo path is:
 
-`chat starts -> session created -> question asked -> numeric answers confirmed if needed -> answer saved -> review/edit -> manual band chosen -> submit -> allocation -> final summary`
+`chat starts -> session created -> question asked -> numeric answers confirmed with yes if needed -> answer saved -> calculated profile -> review/edit or optional override -> automatic liquidity check -> volatility notice -> yes -> submit -> allocation -> report`
 
 The easiest way to study the code is to follow that exact story.
 
@@ -64,7 +68,7 @@ What gets created:
 - chat-side state such as:
   - `session_id`
   - `workflow_stage`
-  - `selected_mock_profile_band`
+  - `selected_mock_profile_band` if the advisor/demo user manually overrides the calculated profile
 
 If you want to see the database object, open `backend/soc_advisor/models.py` and
 look at:
@@ -125,7 +129,7 @@ For currency questions there is one extra stage:
 
 - `handle_currency_question_entry()` parses the amount
 - `send_numeric_confirmation_prompt()` shows the normalized amount
-- `handle_numeric_confirmation_stage()` waits for `confirm`
+- `handle_numeric_confirmation_stage()` waits for `yes`
 
 Then look in `backend/soc_advisor/services.py`:
 
@@ -158,7 +162,7 @@ The current review commands are:
 
 - `change <question number>`
 - `band <band number>`
-- `confirm`
+- `yes`
 
 If the user types `change 2`:
 
@@ -170,11 +174,24 @@ If the user types `change 2`:
 The actual save path is still the same `upsert_answer()` backend call used for a
 normal answer.
 
-## 5. Manual Band Selection
+## 5. Calculated Profile And Optional Override
 
-The active demo path does **not** derive the investor band from the answers yet.
+The active demo path calculates an investor profile from the questionnaire.
 
-Instead, review mode lets the user choose a draft band with:
+In `chat_app.py`, read:
+
+- `score_chat_profile()`
+- `active_profile_for_review()`
+- `upsert_review_workspace()`
+
+What happens:
+
+- `score_chat_profile()` calls `score_session()` in `services.py`
+- `score_session()` applies the active scoring config, currently `config/scoring/v5.json`
+- `active_profile_for_review()` returns the calculated profile unless a manual override was selected
+- the review card highlights the active profile
+
+Review mode still lets the advisor/demo user override the calculated profile with:
 
 - `band 1`
 - `band 2`
@@ -190,23 +207,34 @@ In `chat_app.py`, read:
 
 What happens:
 
-- the chosen band id is stored in chat-side session state
-- review is re-rendered so the user can see the selected draft band
-- `confirm` is blocked until a band is selected
+- the override band id is stored in chat-side session state
+- review is re-rendered so the user can see the active profile
+- `yes` uses the calculated profile if no override exists
 
-This is why the current system is honest about using a manual mock band path.
+This keeps the demo flexible while making the questionnaire-to-profile path the
+normal teaching story.
 
-## 6. Submission Builds The Profile
+## 6. Review Yes Runs Liquidity And Volatility Checks
 
-When the user types `confirm`, Chainlit calls:
+When the user types `yes` from review, Chainlit calls:
 
 - `handle_review_submission()` in `chat_app.py`
 
-That calls:
+That function does not generate the report immediately. It first:
 
+- builds the active calculated or overridden profile
+- runs the liquidity compatibility check
+- automatically switches to the nearest safer compatible profile if the Cash requirement is too high for the selected profile
+- blocks report generation if no profile can support the Cash requirement
+- shows the volatility notice
+
+When the user types `yes` after the volatility notice, Chainlit calls:
+
+- `handle_risk_reality_check_stage()`
+- `finalize_review_submission()`
 - `submit_chat_session()`
 
-And that calls:
+That final call reaches:
 
 - `submit_assessment()` in `backend/soc_advisor/services.py`
 
@@ -219,18 +247,19 @@ Read these functions in `services.py`:
 
 How to think about them:
 
-- `build_manual_mock_profile()` is the current primary path for the chat demo.
-- `score_session()` is the older scored fallback path kept for compatibility.
-- `_select_profile_for_submission()` is the branch point that chooses between those two paths.
+- `score_session()` is the normal questionnaire-to-profile path.
+- `build_manual_mock_profile()` supports advisor/demo overrides.
+- `_select_profile_for_submission()` is the branch point that chooses calculated profile versus override.
 - `submit_assessment()` is the main orchestration function.
 
 `submit_assessment()` does this:
 
 1. loads questionnaire config
-2. resolves the profile path through `_select_profile_for_submission()`
-3. normalizes saved answers with `normalized_answer_values()`
-4. calls `build_recommendation()` in `portfolio.py`
-5. stores the final result with `save_submission_result()`
+2. resolves the calculated or overridden profile through `_select_profile_for_submission()`
+3. applies any automatic liquidity profile adjustment if the selected profile cannot hold enough Cash
+4. normalizes saved answers with `normalized_answer_values()`
+5. calls `build_recommendation()` in `portfolio.py`
+6. stores the final result with `save_submission_result()`
 
 ## 7. Allocation Runs
 
@@ -249,8 +278,8 @@ Read these functions in order:
 
 What each one does:
 
-- `load_portfolio_config()` loads `config/portfolio/v2.json`
-- `load_portfolio_frames()` tries the live SOC API first, then falls back to:
+- `load_portfolio_config()` loads the active portfolio config, currently `config/portfolio/v3.json`
+- `load_portfolio_frames()` uses the configured data mode; the default demo path reads:
   - `data/exports/full_assets_df.csv`
   - `data/exports/full_asset_covariance_df.csv`
 - `build_constraint_summary()` turns the chosen band into class limits
@@ -260,9 +289,9 @@ What each one does:
 
 The key detail:
 
-- the active Variant B path is band-only
-- the user answers are still captured and stored
-- but the allocation policy is driven by the selected band, not by answer-specific overlays
+- the allocation policy is driven by the final profile band
+- liquidity can raise the minimum Cash floor
+- the optimizer still does not use every individual questionnaire answer directly
 
 ## 8. What `_optimize_portfolio()` Actually Does
 
@@ -336,10 +365,10 @@ Do not start by reading everything equally.
 
 On the first pass, treat these as secondary:
 
-- scored fallback logic in `score_session()`
 - compatibility aliases in `CHANGE_TARGET_ALIASES`
 - optional metric-constraint scaffolding in `portfolio.py`
 - FastAPI route boilerplate in `main.py`
+- legacy additive scoring support inside `score_session()`
 
 Those are real, but they are not the main teaching path.
 

@@ -3,7 +3,7 @@
 This module is the allocation engine.
 
 It starts only after a profile band is already known, whether that band came
-from questionnaire scoring or from the current manual mock-band demo flow.
+from questionnaire scoring or from an advisor/demo override.
 
 Inputs:
 
@@ -33,6 +33,7 @@ from fastapi import HTTPException
 from pypfopt import EfficientFrontier, risk_models
 from pypfopt.exceptions import OptimizationError
 from soc_api.frames import get_asset_covariance_df, get_full_assets_df
+from soc_api.raw import SocApiRawClient
 
 from .schemas import (
     ConstraintSummary,
@@ -191,7 +192,7 @@ def _load_live_assets_frame() -> pd.DataFrame:
     """Load the live SOC asset table through the dataframe adapter layer."""
 
     return _require_asset_fields(
-        get_full_assets_df(),
+        get_full_assets_df(raw_client=_build_live_raw_client()),
         source_name="Live SOC asset table",
     )
 
@@ -229,7 +230,10 @@ def _load_live_covariance_frame(tickers: list[str]) -> pd.DataFrame:
     """Load the live covariance matrix for the exact asset universe in use."""
 
     return _normalize_square_matrix_frame(
-        get_asset_covariance_df(tickers=tickers),
+        get_asset_covariance_df(
+            tickers=tickers,
+            raw_client=_build_live_raw_client(),
+        ),
         source_name="Live SOC covariance matrix",
     )
 
@@ -299,12 +303,33 @@ def _load_live_frames() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 @lru_cache(maxsize=1)
+def _build_live_raw_client() -> SocApiRawClient:
+    """Build one live SOC client using the configured short request timeout."""
+
+    return SocApiRawClient(timeout_seconds=settings.soc_api_timeout_seconds)
+
+
+@lru_cache(maxsize=1)
 def load_portfolio_frames() -> tuple[pd.DataFrame, pd.DataFrame, str]:
-    """Load optimizer inputs once per process using live data first, then CSV snapshots as backup.
+    """Load optimizer inputs once per process using the configured data-source mode.
 
     Caching avoids repeated slow failures when the live API is unavailable.
     Restart the process if you need to force a fresh source-selection attempt.
     """
+
+    data_mode = settings.portfolio_data_mode
+
+    if data_mode == "csv_only":
+        logger.info(
+            "Portfolio data source: using local CSV snapshots only (PORTFOLIO_DATA_MODE=csv_only)."
+        )
+        assets, covariance = load_snapshot_frames()
+        return assets, covariance, "csv_snapshot"
+
+    if data_mode == "live_only":
+        assets, covariance = _load_live_frames()
+        logger.info("Portfolio data source: using live SOC API data.")
+        return assets, covariance, "live_soc_api"
 
     try:
         assets, covariance = _load_live_frames()
@@ -341,6 +366,7 @@ def build_constraint_summary(
     *,
     profile_band: str,
     portfolio_config: dict[str, Any],
+    cash_floor_override: float | None = None,
     fallback_note: str | None = None,
 ) -> ConstraintSummary:
     """Translate one profile band into a Variant B constraint set."""
@@ -376,6 +402,24 @@ def build_constraint_summary(
                 detail=f"Invalid metric constraint for '{key}': minimum exceeds maximum.",
             )
 
+    applied_overlays: list[str] = []
+    if cash_floor_override is not None:
+        cash_floor = max(0.0, float(cash_floor_override))
+        configured_cash_min = super_minima.get("Cash", 0.0)
+        effective_cash_min = max(configured_cash_min, cash_floor)
+        cash_max = super_maxima.get("Cash", 1.0)
+        if effective_cash_min > cash_max + 1e-9:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "The liquidity Cash floor is higher than the selected profile's "
+                    "Cash ceiling. Select a more conservative compatible profile "
+                    "or revise the liquidity answers."
+                ),
+            )
+        super_minima["Cash"] = effective_cash_min
+        applied_overlays.append(f"liquidity_cash_floor:{effective_cash_min:.6f}")
+
     return ConstraintSummary(
         version=portfolio_config["version"],
         objective=portfolio_config["optimizer"]["objective"],
@@ -384,7 +428,7 @@ def build_constraint_summary(
         super_class_maxima=super_maxima,
         metric_minima=metric_minima,
         metric_maxima=metric_maxima,
-        applied_overlays=[],
+        applied_overlays=applied_overlays,
         fallback_note=fallback_note,
     )
 
@@ -612,15 +656,26 @@ def _build_holdings(assets: pd.DataFrame, weights: pd.Series) -> list[PortfolioH
     return holdings
 
 
-def _build_recommendation_notes(profile: ProfileSummary) -> list[str]:
+def _build_recommendation_notes(
+    profile: ProfileSummary,
+    *,
+    cash_floor_override: float | None = None,
+) -> list[str]:
     """Return the short disclosure notes shown with the recommendation."""
 
     notes = [
         "This recommendation uses the experimental PyPortfolioOpt allocation engine over the SOC asset universe and covariance inputs.",
-        "Variant B uses band-only class ranges with no answer-based overlays in the active demo path.",
-        "The optimizer only decides the asset mix inside the selected band ranges.",
-        "Numeric liquidity inputs may be captured in the current questionnaire, but they do not yet drive profile selection or portfolio construction.",
+        "The active policy uses profile class ranges plus a Cash-floor liquidity check before optimization.",
+        "The optimizer only decides the asset mix inside the approved profile and liquidity constraints.",
     ]
+    if cash_floor_override is not None:
+        notes.append(
+            "Numeric liquidity inputs are used to check profile compatibility and set the minimum Cash allocation; broader suitability scoring remains under development."
+        )
+    else:
+        notes.append(
+            "Numeric liquidity inputs were captured, but no Cash-floor liquidity overlay was available for this run."
+        )
     if profile.profile_source == "manual_mock_band":
         notes.append(
             "This run used a manually selected mock investor band because the question-to-band pipeline is still under construction."
@@ -636,6 +691,7 @@ def build_recommendation(
     *,
     profile: ProfileSummary,
     portfolio_version: str | None = None,
+    cash_floor_override: float | None = None,
 ) -> RecommendationSummary:
     """Build a portfolio recommendation from a known profile band.
 
@@ -654,6 +710,7 @@ def build_recommendation(
     constraints = build_constraint_summary(
         profile_band=profile.profile_band,
         portfolio_config=portfolio_config,
+        cash_floor_override=cash_floor_override,
     )
 
     try:
@@ -679,5 +736,8 @@ def build_recommendation(
         holdings=_build_holdings(assets, weights),
         metrics=metrics,
         constraints=constraints,
-        notes=_build_recommendation_notes(profile),
+        notes=_build_recommendation_notes(
+            profile,
+            cash_floor_override=cash_floor_override,
+        ),
     )

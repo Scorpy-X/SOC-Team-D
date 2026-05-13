@@ -142,6 +142,234 @@
       </table>
     </section>
 
+    {% if report.calculation_trail %}
+    <section>
+      <div class="eyebrow">Chronological Calculation Trail</div>
+      <h2>Formula path from answers to portfolio.</h2>
+      <div class="summary">
+        {% for step in report.calculation_trail %}
+        <div class="panel">
+          <h3>{{ step.title }}</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>{{ step.formula }}</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>{{ step["values"] }}</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>{{ step.result }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if report.scoring_policy_trace %}
+    <section>
+      <div class="eyebrow">Questionnaire Scoring</div>
+      <h2>DOCX-aligned risk bucket calculation.</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th>Method</th>
+            <td>{{ report.scoring_policy_trace.method }}</td>
+          </tr>
+          <tr>
+            <th>Capacity score</th>
+            <td>{{ report.scoring_policy_trace.capacity_score }}</td>
+          </tr>
+          <tr>
+            <th>Tolerance score</th>
+            <td>{{ report.scoring_policy_trace.tolerance_score }}</td>
+          </tr>
+          <tr>
+            <th>Final score before caps</th>
+            <td>{{ report.scoring_policy_trace.final_score_before_caps }}</td>
+          </tr>
+          <tr>
+            <th>Final score after caps</th>
+            <td>{{ report.scoring_policy_trace.final_score_after_caps }}</td>
+          </tr>
+          <tr>
+            <th>Displayed risk score</th>
+            <td>{{ report.scoring_policy_trace.displayed_risk_score }}</td>
+          </tr>
+          <tr>
+            <th>Draft profile from score</th>
+            <td>{{ report.scoring_policy_trace.draft_profile }}</td>
+          </tr>
+          <tr>
+            <th>Final scoring profile</th>
+            <td>{{ report.scoring_policy_trace.final_profile }}</td>
+          </tr>
+          <tr>
+            <th>Applied caps</th>
+            <td>{{ report.scoring_policy_trace.applied_caps|join("; ") or "None" }}</td>
+          </tr>
+          <tr>
+            <th>Manual override used</th>
+            <td>{{ report.scoring_policy_trace.manual_override_used }}</td>
+          </tr>
+          <tr>
+            <th>Manual override</th>
+            <td>{{ report.scoring_policy_trace.manual_override }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="summary">
+        <div class="panel">
+          <h3>Section scores</h3>
+          <ul class="note-list">
+            {% for label, value in report.scoring_policy_trace.section_scores.items() %}
+            <li>{{ label }}: {{ value }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Question scores</h3>
+          <ul class="note-list">
+            {% for label, value in report.scoring_policy_trace.question_scores.items() %}
+            <li>{{ label }}: {{ value }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if report.risk_reality_check %}
+    <section>
+      <div class="eyebrow">Risk Reality Check</div>
+      <h2>Pre-report volatility stress illustration.</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th>Method</th>
+            <td>{{ report.risk_reality_check.method }}</td>
+          </tr>
+          <tr>
+            <th>Multiplier</th>
+            <td>{{ report.risk_reality_check.multiplier }}</td>
+          </tr>
+          <tr>
+            <th>Annual volatility used</th>
+            <td>{{ report.risk_reality_check.annual_volatility }}</td>
+          </tr>
+          <tr>
+            <th>Stress movement shown</th>
+            <td>{{ report.risk_reality_check.stress_percent }}</td>
+          </tr>
+          <tr>
+            <th>Portfolio value</th>
+            <td>{{ report.risk_reality_check.portfolio_value or "Not captured" }}</td>
+          </tr>
+          <tr>
+            <th>Stress amount shown</th>
+            <td>{{ report.risk_reality_check.stress_amount or "N/A" }}</td>
+          </tr>
+          <tr>
+            <th>User action</th>
+            <td>{{ report.risk_reality_check.user_action }}</td>
+          </tr>
+          <tr>
+            <th>Revised question ids</th>
+            <td>{{ report.risk_reality_check.revised_question_ids|join(", ") or "None" }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="panel-subtle">
+        This is a simplified stress estimate, not formal VaR and not a promise about losses.
+      </p>
+    </section>
+    {% endif %}
+
+    {% if report.liquidity_policy_check %}
+    <section>
+      <div class="eyebrow">Liquidity Policy Check</div>
+      <h2>Cash-floor compatibility before optimization.</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th>Method</th>
+            <td>{{ report.liquidity_policy_check.method }}</td>
+          </tr>
+          <tr>
+            <th>Liquidity bucket</th>
+            <td>{{ report.liquidity_policy_check.liquidity_bucket }}</td>
+          </tr>
+          <tr>
+            <th>Formula</th>
+            <td>major expense + monthly expenses * emergency months</td>
+          </tr>
+          <tr>
+            <th>Portfolio value</th>
+            <td>{{ report.liquidity_policy_check.portfolio_value }}</td>
+          </tr>
+          <tr>
+            <th>Major expense amount</th>
+            <td>{{ report.liquidity_policy_check.major_expense_withdrawal_amount }}</td>
+          </tr>
+          <tr>
+            <th>Monthly expenses</th>
+            <td>{{ report.liquidity_policy_check.essential_monthly_expenses }}</td>
+          </tr>
+          <tr>
+            <th>Emergency answer</th>
+            <td>{{ report.liquidity_policy_check.emergency_fund_option_id }}</td>
+          </tr>
+          <tr>
+            <th>Emergency months used</th>
+            <td>{{ report.liquidity_policy_check.emergency_months_used }}</td>
+          </tr>
+          <tr>
+            <th>Required liquidity</th>
+            <td>{{ report.liquidity_policy_check.required_liquidity_amount }}</td>
+          </tr>
+          <tr>
+            <th>Liquidity floor</th>
+            <td>{{ report.liquidity_policy_check.liquidity_floor }}</td>
+          </tr>
+          <tr>
+            <th>Selected profile</th>
+            <td>{{ report.liquidity_policy_check.selected_profile }}</td>
+          </tr>
+          <tr>
+            <th>Selected Cash ceiling</th>
+            <td>{{ report.liquidity_policy_check.selected_cash_ceiling }}</td>
+          </tr>
+          <tr>
+            <th>Selected profile compatible</th>
+            <td>{{ report.liquidity_policy_check.selected_profile_compatible }}</td>
+          </tr>
+          <tr>
+            <th>Effective profile</th>
+            <td>{{ report.liquidity_policy_check.effective_profile }}</td>
+          </tr>
+          <tr>
+            <th>Effective Cash ceiling</th>
+            <td>{{ report.liquidity_policy_check.effective_cash_ceiling }}</td>
+          </tr>
+          <tr>
+            <th>Profile adjusted</th>
+            <td>{{ report.liquidity_policy_check.profile_adjusted }}</td>
+          </tr>
+          <tr>
+            <th>User action</th>
+            <td>{{ report.liquidity_policy_check.user_action }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
     <section>
       <div class="eyebrow">Captured Answers</div>
       <h2>Questionnaire inputs saved for this run.</h2>
@@ -171,7 +399,7 @@
 
     <section>
       <div class="eyebrow">Constraints</div>
-      <h2>Band policy applied before solving.</h2>
+      <h2>Profile policy applied before solving.</h2>
       <div class="summary">
         <div class="panel">
           <h3>Superclass minima</h3>
@@ -187,6 +415,18 @@
             {% for label, value in report.decision_trace.super_class_maxima.items() %}
             <li>{{ label }}: {{ "%.1f"|format(value * 100) }}%</li>
             {% endfor %}
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Applied overlays</h3>
+          <ul class="note-list">
+            {% if report.decision_trace.applied_overlays %}
+            {% for overlay in report.decision_trace.applied_overlays %}
+            <li>{{ overlay }}</li>
+            {% endfor %}
+            {% else %}
+            <li>None</li>
+            {% endif %}
           </ul>
         </div>
       </div>

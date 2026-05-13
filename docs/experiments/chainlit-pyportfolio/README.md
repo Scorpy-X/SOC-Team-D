@@ -1,61 +1,61 @@
-# Chat-Based Prototype Docs
+# Chainlit Advisor And Portfolio Report Notes
 
-This folder explains the current Week 5 advisor prototype in plain language.
+This folder explains the active Week 6 advisor prototype in `SOC Team D`.
 
-At a high level, the prototype works like this:
+The live path is:
 
-1. the user answers a short questionnaire in a chat window
-2. money amounts are checked and confirmed before they are saved
-3. the user reviews the answers and can change one if needed
-4. the user chooses a draft investor profile
-5. the system produces a sample portfolio inside the limits for that profile
-6. the chatbot gives a short summary and attaches a generated HTML portfolio report
+```text
+typed questions -> money amount yes confirmation -> review/edit -> calculated profile -> optional advisor override -> liquidity check -> volatility notice -> yes -> allocation -> chat summary -> HTML reports
+```
 
-## What This Prototype Does
+## What Someone Can Do
 
-- runs a chat-based questionnaire
-- accepts both multiple-choice answers and money amount answers
-- saves answers as the conversation goes
-- lets the user review numbered answers and update them by question number
-- lets the user choose one of five draft investor profiles manually
-- returns a compact portfolio summary in the chat
-- generates a user-facing HTML report with the detailed portfolio explanation
-- generates a technical audit report with decision trace details
+- answer the investor questionnaire in a chat window
+- confirm parsed money amounts before they are saved
+- review and edit numbered answers
+- see the investor profile calculated from the questionnaire
+- optionally choose a different profile during advisor/demo review
+- have liquidity needs checked automatically before the report is generated
+- see a disclosure if the profile is adjusted to support the required Cash reserve
+- receive key portfolio metrics and grouped holdings in chat
+- open a user-facing HTML portfolio report
+- open a technical audit report for scoring, liquidity, formula, and optimizer trace details
 
-## What Is Important To Know
+## Most Useful Docs In This Folder
 
-- the current demo still uses manual profile selection
-- the questionnaire does not yet assign the final profile automatically
-- money amount answers are collected and reviewed, but they do not yet change the portfolio recommendation
-- free-text narrative answers are still not part of the live prototype
-- the system tries to use live SOC data first and falls back to the saved local dataset if the live source is unavailable
-- generated report files are local runtime artifacts under `data/reports/` and should not be committed
-- optional OpenAI support can rewrite report prose only; it cannot change holdings, metrics, profile selection, or allocation logic
+- `docx-aligned-risk-scoring.md` explains the question-to-profile model.
+- `risk-profiling-questionnaire-reference.md` records the current questionnaire.
+- `chainlit-flow.md` explains the chat flow.
+- `deterministic-explanation-reference.md` lists the deterministic explanation wording.
+- `testing-and-validation.md` explains the test and validation evidence.
+- `optimizer-defense-and-validation.md` explains PyPortfolioOpt credibility and the SciPy cross-check.
+- `pypfopt-constraints-to-holdings.md` explains how constraints become holdings.
+- `portfolio-policy-matrix.md` summarizes the five profile constraints.
+- `chainlit-house-ui.md` explains the Barita-leaning blue UI/report direction.
+- `application-boundaries.md` explains where Chainlit, FastAPI, and PyPortfolioOpt fit.
 
-## Read These First
+## Active Configuration
 
-1. `defense-story.md`
-2. `risk-profiling-questionnaire-reference.md`
-3. `application-boundaries.md`
-4. `code-reading-guide.md`
-5. `allocation-methodology-and-testing.md`
-6. `pypfopt-constraints-to-holdings.md`
-7. `portfolio-policy-matrix.md`
-8. `chainlit-flow.md`
-9. `worked-examples.md`
+- questionnaire: `config/questionnaires/v4.json`
+- scoring: `config/scoring/v5.json`
+- portfolio policy: `config/portfolio/v3.json`
 
-## Technical Note
-
-Current active configuration:
-
-- questionnaire: `config/questionnaires/v3.json`
-- scoring fallback: `config/scoring/v4.json`
-- portfolio policy: `config/portfolio/v2.json`
-
-Main prototype files:
+## Main Files
 
 - `experiments/chainlit_chat/chat_app.py`
 - `backend/soc_advisor/`
-- `backend/soc_advisor/reporting.py`
 - `backend/soc_advisor/report_templates/`
-- `tests/`
+- `public/theme.json`
+- `public/house-ui.css`
+- `public/chainlit-custom.css`
+- `public/elements/`
+- `scripts/run_advisor_flow_validation.py`
+- `scripts/run_optimizer_validation.py`
+- `scripts/generate_sample_investor_reports.py`
+
+## Important Boundary
+
+This is the submitted Week 6 prototype path. It is not a final deployed client
+portal and it is not final regulated financial advice. The purpose is to show a
+working, explainable, testable advisor workflow that can be demonstrated and
+defended.

@@ -76,9 +76,14 @@ ef.max_sharpe()
 weights = ef.clean_weights()
 ```
 
+If you want this as a runnable repo example instead of pseudocode, use:
+
+- `scripts/demo_bare_pypfopt.py`
+- `bare-pypfopt-demo.md`
+
 The current product wrapper adds the parts a notebook usually does not:
 
-- load data from the live SOC API or CSV fallback
+- load data from the configured source, with saved CSV snapshots as the default demo path
 - align tickers between the asset table and covariance matrix
 - translate the chosen band into class constraints
 - repair small covariance PSD issues in memory before solving
@@ -86,12 +91,14 @@ The current product wrapper adds the parts a notebook usually does not:
 
 ## The Current Runtime Data Path
 
-The allocator now loads data in this order:
+The allocator supports three data modes. The default local demo mode reads the
+saved CSV snapshots directly. Live mode can be enabled when API access is
+available.
 
-1. try the live SOC API dataframe adapters in `backend/soc_api/frames.py`
-2. if that fails, fall back to:
-   - `data/exports/full_assets_df.csv`
-   - `data/exports/full_asset_covariance_df.csv`
+The saved snapshot files are:
+
+- `data/exports/full_assets_df.csv`
+- `data/exports/full_asset_covariance_df.csv`
 
 Important rule:
 

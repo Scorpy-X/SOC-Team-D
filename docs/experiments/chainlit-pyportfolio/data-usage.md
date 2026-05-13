@@ -2,13 +2,16 @@
 
 ## Main data sources
 
-The portfolio engine now tries the live SOC API first and falls back to the
-CSV snapshots in:
+The portfolio engine uses the saved CSV snapshots by default for reliable local
+demos:
 
 - `data/exports/full_assets_df.csv`
 - `data/exports/full_asset_covariance_df.csv`
 
-The correlation CSV is still useful for analysis and explanation, but the optimizer uses covariance directly in this version.
+Live SOC API loading can still be enabled through `PORTFOLIO_DATA_MODE`, but the
+default demo path does not depend on a live API key. The correlation CSV is
+still useful for analysis and explanation, but the optimizer uses covariance
+directly in this version.
 
 If you want to verify how the covariance table lines up with correlation plus volatility, see `covariance-validation.md`.
 

@@ -19,5 +19,5 @@ if str(BACKEND_DIR) not in sys.path:
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8000"))
+    port = int(os.getenv("PORT", "5000"))
     uvicorn.run("soc_advisor.main:app", host="127.0.0.1", port=port, reload=True)

@@ -1,0 +1,142 @@
+@page {
+  size: letter;
+  margin: 0.6in 0.7in 0.7in;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 0;
+  color: #24292f;
+  background: #ffffff;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+#title-block-header {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 1.3em;
+  margin-bottom: 0.45em;
+  line-height: 1.22;
+  color: #111827;
+  font-weight: 650;
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: 2.05rem;
+  border-bottom: 1px solid #d0d7de;
+  padding-bottom: 0.3em;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.35rem;
+  border-bottom: 1px solid #d8dee4;
+  padding-bottom: 0.2em;
+}
+
+h3 {
+  font-size: 1.08rem;
+}
+
+p,
+ul,
+ol,
+blockquote,
+table,
+pre {
+  margin-top: 0;
+  margin-bottom: 0.9em;
+}
+
+ul,
+ol {
+  padding-left: 1.4em;
+}
+
+li + li {
+  margin-top: 0.2em;
+}
+
+code {
+  font-family: Consolas, "SFMono-Regular", "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+  background: #f6f8fa;
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  padding: 0.14em 0.36em;
+}
+
+pre {
+  background: #f6f8fa;
+  border: 1px solid #d8dee4;
+  border-radius: 8px;
+  padding: 0.9em 1em;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+pre code {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.92em;
+}
+
+blockquote {
+  color: #57606a;
+  border-left: 4px solid #d0d7de;
+  padding: 0.1em 1em;
+  margin-left: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+th,
+td {
+  border: 1px solid #d0d7de;
+  padding: 0.45em 0.65em;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f6f8fa;
+  font-weight: 600;
+}
+
+a {
+  color: #0969da;
+  text-decoration: none;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #d0d7de;
+  margin: 1.4em 0;
+}
+
+img {
+  max-width: 100%;
+}

@@ -1,233 +1,253 @@
 # Risk Profiling Questionnaire Reference
 
-This file is a cleaned reference for the questionnaire content taken from
-`Risk Profiling Questionnaire.docx`.
+This file is a cleaned reference for the current questionnaire direction taken
+from the risk-profiling DOCX material and later team decisions.
 
-It is a product/reference note, not the source of truth for runtime behavior.
-The live source of truth is:
+It is a product/reference note. Runtime truth lives in:
 
-- `config/questionnaires/v3.json`
+- `config/questionnaires/v4.json`
+- `config/scoring/v5.json`
+- `config/portfolio/v3.json`
 
-## Important implementation note
+For the full scoring formulas, read:
+
+- `docs/experiments/chainlit-pyportfolio/docx-aligned-risk-scoring.md`
+
+## Implementation Note
 
 The current implementation supports:
 
 - `single_choice`
 - `currency_amount`
 
-The "open-ended" liquidity questions are implemented as **numeric open-entry**
-amounts, not free-form narrative text.
-
-Those amount inputs are:
-
-- captured now
-- reviewable now
-- not yet used in the active allocation path
+The liquidity questions are implemented as numeric money entries and a
+multiple-choice emergency-reserve target. They are not free-text narrative
+answers.
 
 ## Liquidity Need
 
-Reference formulas from the source doc:
+Liquidity is handled before the portfolio is generated. It is not blended into
+the risk score.
 
-- `Cash Need = (q2 + (q3 * months)) * multiplier`
-- `Liquidity percentage = Cash Need / Portfolio Value`
-- `Investable Amount = 1 - liquidity percentage`
+Current formula:
 
-These formulas are kept as **reference only** in the current build. The live
-system captures the underlying inputs but does not yet feed them into
-allocation.
+```text
+required liquidity = major expense withdrawal + (essential monthly expenses * emergency months)
+liquidity floor = required liquidity / portfolio value
+```
 
-### 1. Portfolio value
+Emergency-month mapping:
 
-- Question:
-  - `What is your portfolio value? Please enter the dollar amount you will be investing today.`
-- Runtime type:
-  - `currency_amount`
-- Status:
-  - captured now
-  - not used for scoring now
-  - not yet used for allocation
-- Current implementation note:
-  - minimum enforced at runtime is `$25,000`
+- `0 months` -> `0`
+- `1-3 months` -> `2`
+- `4-6 months` -> `5`
+- `More than 6 months` -> `9`
 
-### 2. Major expense withdrawal amount
+That liquidity floor becomes the minimum Cash requirement. If the selected
+profile cannot hold enough Cash, the chatbot automatically uses the nearest
+more conservative compatible profile and discloses that adjustment. If no
+profile can satisfy the liquidity floor, report generation is blocked until the
+liquidity answers are revised.
 
-- Question:
-  - `What is the dollar amount of any major expense you anticipate needing to withdraw over the next 12 to 24 months?`
-- Runtime type:
-  - `currency_amount`
-- Status:
-  - captured now
-  - not used for scoring now
-  - not yet used for allocation
+### Q1. Portfolio value
 
-### 3. Essential monthly expenses
+- Type: `currency_amount`
+- Used for scoring: no
+- Used for liquidity: yes
+- Used for report dollar estimates: yes
+- Minimum: `$25,000`
 
-- Question:
-  - `What is the dollar amount of your essential monthly expenses?`
-- Runtime type:
-  - `currency_amount`
-- Status:
-  - captured now
-  - not used for scoring now
-  - not yet used for allocation
+Question:
 
-### 4. Emergency reserve target
+> How much are you investing in this portfolio today? The minimum portfolio
+> value for this questionnaire is $25,000.
 
-- Question:
-  - `How many months of expenses would you like to have set aside for emergencies?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `0 months`
-  - `1-3 months`
-  - `4-6 months`
-  - `More than 6 months`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+### Q2. Major expense withdrawal
 
-### 5. Non-investment income stability
+- Type: `currency_amount`
+- Used for scoring: no
+- Used for liquidity: yes
 
-- Question:
-  - `How would you describe your non-investment income?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `Very stable`
-  - `Moderately stable`
-  - `Unstable`
-- Reference note:
-  - source wording associates these with multipliers `1.0x`, `1.25x`, and `1.5x`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+Question:
+
+> How much might you need to withdraw for a major expense in the next 12 to 24
+> months?
+
+### Q3. Essential monthly expenses
+
+- Type: `currency_amount`
+- Used for scoring: no
+- Used for liquidity: yes
+
+Question:
+
+> What are your estimated essential monthly expenses?
+
+### Q4. Desired emergency reserve
+
+- Type: `single_choice`
+- Used for scoring: no
+- Used for liquidity: yes
+
+Options:
+
+- `0 months`
+- `1-3 months`
+- `4-6 months`
+- `More than 6 months`
 
 ## Risk Capacity
 
-### 6. Time horizon
+Risk capacity is about the investor's financial ability to take risk.
 
-- Question:
-  - `What is your time horizon? When do you anticipate needing to withdraw the first major sum from your investment?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `5 years or less`
-  - `6 to 9 years`
-  - `10 years or more`
-- Source note:
-  - the doc frames these as stock-allocation caps
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+Formula:
 
-### 7. Investment phase
+```text
+capacity score =
+((Q5 * 0.20) + (Q6 * 0.30) + (Q7 * 0.15) + (Q8 * 0.35) + (Q9 * 0.35)) / 1.35
+```
 
-- Question:
-  - `What phase of your investment life would you say you are in?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `Capital Accumulation`
-  - `Capital Disbursement`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+### Q5. Current emergency fund
+
+- Weight: `20%` of the capacity section before normalization
+- Factor: emergency fund strength
+
+Options:
+
+- `0 months`
+- `1-3 months`
+- `4-6 months`
+- `More than 6 months`
+
+### Q6. Non-investment income stability
+
+- Weight: `30%`
+- Factor: income stability
+
+Options:
+
+- `Very stable`
+- `Moderately stable`
+- `Unstable`
+
+### Q7. Dependents and obligations
+
+- Weight: `15%`
+- Factor: debt burden / financial obligations
+
+Options:
+
+- `At least three dependents rely heavily on my income`
+- `Two or more people depend on my income`
+- `I have little to no financial dependence obligations`
+
+### Q8. Time horizon
+
+- Weight: `35%`
+- Factor: time horizon
+
+Options:
+
+- `5 years or less`
+- `6 to 9 years`
+- `10 years or more`
+
+### Q9. Investment phase
+
+- Weight: `35%`
+- Factor: investment phase
+
+Options:
+
+- `Capital disbursement`
+- `Capital accumulation`
 
 ## Risk Tolerance
 
-### 8. Market drop response
+Risk tolerance is about the investor's willingness and behavioural ability to
+stay with risk.
 
-- Question:
-  - `If the stock market dropped 25% tomorrow and stayed there for two years, what would you do?`
-- Runtime type:
-  - `single_choice`
-- Runtime options:
-  - `Sell everything to protect what is left`
-  - `Sell a portion and move to a safer investment`
-  - `Invest more money to take advantage of lower prices`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+Formula:
 
-### 9. Willingness to accept short-term losses
+```text
+tolerance score =
+((Q10 * 0.40) + (Q11 * 0.15) + (Q12 * 0.15) + (Q13 * 0.15) + (Q14 * 0.25)) / 1.10
+```
 
-- Question:
-  - `How willing are you to accept short-term losses for potential long-term gain?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `Very willing`
-  - `Willing`
-  - `Indifferent`
-  - `Unwilling`
-  - `Very unwilling`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+### Q10. Market drop response
 
-### 10. Financial knowledge
+- Weight: `40%`
+- Factor: drawdown reaction
+- Special rule: `Sell everything` caps the calculated profile at `Balanced`
 
-- Question:
-  - `How knowledgeable are you about financial and investment concepts?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `Not at all knowledgeable`
-  - `Minimally knowledgeable`
-  - `Moderately knowledgeable`
-  - `Competent`
-  - `Very knowledgeable`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+Options:
 
-### 11. Investing experience length
+- `Sell everything to protect what is left`
+- `Sell a portion and move to a safer investment`
+- `Do nothing / stay invested`
+- `Invest more to take advantage of lower prices`
 
-- Question:
-  - `How long have you been investing?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `Less than a year`
-  - `1-3 years`
-  - `4-10 years`
-  - `More than 10 years`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+### Q11. Short-term loss willingness
 
-### 12. Past loss action
+- Weight: `15%`
+- Factor: return-seeking preference
 
-- Question:
-  - `In the past, when faced with investment losses, what action did you take?`
-- Runtime type:
-  - `single_choice`
-- Options:
-  - `Sold Out`
-  - `Sold Some`
-  - `Did Nothing`
-  - `Purchased More`
-- Status:
-  - captured now
-  - used for scoring now
-  - not yet used directly for allocation
+Options:
 
-## Current live product truth
+- `Very willing`
+- `Willing`
+- `Indifferent`
+- `Unwilling`
+- `Very unwilling`
 
-The current active demo path is still:
+### Q12. Financial knowledge
 
-`typed questionnaire -> review/edit -> manual mock band selection -> Variant B allocation -> holdings`
+- Weight: `15%`
+- Factor: behavioural consistency support signal
+
+Options:
+
+- `Limited investment knowledge`
+- `Basic investment understanding`
+- `Moderate investment understanding`
+- `Competent investment understanding`
+- `Advanced investment knowledge`
+
+### Q13. Investing experience length
+
+- Weight: `15%`
+- Factor: behavioural consistency support signal
+
+Options:
+
+- `Less than a year`
+- `1-3 years`
+- `4-10 years`
+- `More than 10 years`
+
+### Q14. Hypothetical 30% loss reaction
+
+- Weight: `25%`
+- Factor: loss aversion
+
+Options:
+
+- `I should move to safer investments before losses worsen.`
+- `I may have taken more risk than I am comfortable with.`
+- `Market declines are uncomfortable but expected.`
+- `My long-term plan remains unchanged.`
+- `This may be an opportunity to invest more.`
+
+## Current Live Product Truth
+
+The current active demo path is:
+
+`typed questionnaire -> calculated profile -> review/edit/optional override -> liquidity check -> risk reality check -> allocation -> report`
 
 That means:
 
-- the new amount questions are valuable capture fields
-- they are not yet deciding the investor band
-- they are not yet changing the PyPortfolio allocation constraints
+- the questionnaire calculates an investor profile
+- advisor/manual override is still available in review mode
+- liquidity answers are used to check the Cash floor and profile compatibility
+- the portfolio policy uses the approved `portfolio v3` ranges
+- PyPortfolioOpt builds the portfolio after the final profile and Cash floor are known
