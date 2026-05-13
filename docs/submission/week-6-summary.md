@@ -45,6 +45,7 @@ The snapshot includes:
 - independent SciPy SLSQP replay of the constrained optimizer problem
 - stress checks for return haircut, covariance shock, and largest-holding removal
 - generated sample reports for visual review
+- committed validation summaries and sample reports under `docs/submission/week-6-evidence/`
 
 ## Current Limits
 

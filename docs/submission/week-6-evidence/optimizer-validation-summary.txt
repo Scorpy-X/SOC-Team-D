@@ -1,0 +1,355 @@
+SOC Advisor Optimizer Validation
+Generated: 2026-05-13T08:46:02-05:00
+
+Overall result: PASS
+
+Audit trace
+- Portfolio config version: v3
+- Portfolio config name: Liquidity-aware four-superclass allocation defaults
+- Data source used: csv_snapshot
+- Asset count: 25
+- Covariance shape: 25 x 25
+- Optimizer objective: max_sharpe
+- Risk-free rate: 0.0
+- Weight bounds: [0.0, 0.4]
+- PSD repair enabled: True
+
+Validation claim
+This report checks whether the optimizer integration obeys configured constraints and can be replayed through an independent SciPy SLSQP solver path. It does not prove that the output is suitable financial advice.
+
+========================================================================
+Profile 1: Very Conservative
+Internal id: very_conservative
+Description: Capital-preservation profile with the strongest cash and fixed-income anchor and only a limited growth allowance.
+
+Profile audit trace
+- Objective: max_sharpe
+- Single-asset cap: 40.00%
+- Superclass minima: {'Cash': 0.15, 'Fixed Income': 0.55, 'Equity': 0.0, 'Fund': 0.0}
+- Superclass maxima: {'Cash': 0.35, 'Fixed Income': 0.8, 'Equity': 0.2, 'Fund': 0.1}
+
+Optimized portfolio summary
+- Expected yearly return: 5.79%
+- Expected yearly movement: 1.81%
+- Estimated income: 4.98%
+- Expense ratio: 0.00%
+- Modified duration: 0.8234
+- Largest holding: 40.00%
+- Constraint valid: PASS
+
+Optimized superclass mix
+- Cash: 35.00%
+- Equity: 3.14%
+- Fixed Income: 61.86%
+
+Optimized holdings and weights
+- CWPU: 40.00% | Fixed Income | Short Government Bonds | JMD
+- TBILLJMD: 34.55% | Cash | JMD T-Bill | JMD
+- PVAU: 21.86% | Fixed Income | Short Government Bonds | JMD
+- BQB: 1.32% | Equity | Emerging Market Equity | USD
+- IZQLN: 0.75% | Equity | Domestic Cyclical Equity | JMD
+- XKFZ: 0.66% | Equity | Domestic Financial Equity | JMD
+- TBILLUSD: 0.45% | Cash | USD T-Bill | USD
+- XPMCJ: 0.25% | Equity | Domestic Defensive Equity | JMD
+- WBG: 0.16% | Equity | Global Tech Equity | USD
+
+Constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 40.00%; cap: 40.00%
+PASS - Cash range: Observed: 35.00%; allowed: 15.00%-35.00%
+PASS - Equity range: Observed: 3.14%; allowed: 0.00%-20.00%
+PASS - Fixed Income range: Observed: 61.86%; allowed: 55.00%-80.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-10.00%
+
+Independent solver cross-check
+- Cross-check path: SciPy SLSQP cross-check
+- PyPortfolioOpt Sharpe objective: 3.1962
+- SciPy Sharpe objective: 3.1962
+- Objective gap: 0.0000
+- Largest weight difference: 0.00%
+- SciPy constraints valid: PASS
+
+SciPy constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 40.00%; cap: 40.00%
+PASS - Cash range: Observed: 35.00%; allowed: 15.00%-35.00%
+PASS - Equity range: Observed: 3.14%; allowed: 0.00%-20.00%
+PASS - Fixed Income range: Observed: 61.86%; allowed: 55.00%-80.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-10.00%
+PASS - SciPy solver convergence: Optimization terminated successfully
+
+Stress checks
+PASS - Expected-return haircut: Feasible. Return 5.21%, movement 1.81%.
+PASS - Covariance risk shock: Feasible. Return 5.79%, movement 1.90%.
+PASS - Largest holding removed (CWPU): Feasible. Return 6.75%, movement 2.75%.
+
+========================================================================
+Profile 2: Conservative
+Internal id: conservative
+Description: Stability-first profile with fixed income as the main anchor and a modest allowance for growth assets.
+
+Profile audit trace
+- Objective: max_sharpe
+- Single-asset cap: 40.00%
+- Superclass minima: {'Cash': 0.1, 'Fixed Income': 0.45, 'Equity': 0.15, 'Fund': 0.0}
+- Superclass maxima: {'Cash': 0.3, 'Fixed Income': 0.7, 'Equity': 0.35, 'Fund': 0.1}
+
+Optimized portfolio summary
+- Expected yearly return: 7.01%
+- Expected yearly movement: 2.61%
+- Estimated income: 5.18%
+- Expense ratio: 0.00%
+- Modified duration: 1.6667
+- Largest holding: 40.00%
+- Constraint valid: PASS
+
+Optimized superclass mix
+- Cash: 30.00%
+- Equity: 15.00%
+- Fixed Income: 55.00%
+
+Optimized holdings and weights
+- CWPU: 40.00% | Fixed Income | Short Government Bonds | JMD
+- TBILLJMD: 30.00% | Cash | JMD T-Bill | JMD
+- QPESE: 15.00% | Fixed Income | Long Government Bonds | JMD
+- XKFZ: 4.12% | Equity | Domestic Financial Equity | JMD
+- XPMCJ: 2.64% | Equity | Domestic Defensive Equity | JMD
+- BQB: 2.50% | Equity | Emerging Market Equity | USD
+- IZQLN: 1.74% | Equity | Domestic Cyclical Equity | JMD
+- GGOC: 1.71% | Equity | Domestic Defensive Equity | JMD
+- PDTOU: 1.02% | Equity | Domestic Defensive Equity | JMD
+- TIHE: 0.80% | Equity | Domestic Financial Equity | JMD
+- WBG: 0.46% | Equity | Global Tech Equity | USD
+
+Constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 40.00%; cap: 40.00%
+PASS - Cash range: Observed: 30.00%; allowed: 10.00%-30.00%
+PASS - Equity range: Observed: 15.00%; allowed: 15.00%-35.00%
+PASS - Fixed Income range: Observed: 55.00%; allowed: 45.00%-70.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-10.00%
+
+Independent solver cross-check
+- Cross-check path: SciPy SLSQP cross-check
+- PyPortfolioOpt Sharpe objective: 2.6892
+- SciPy Sharpe objective: 2.6892
+- Objective gap: 0.0000
+- Largest weight difference: 0.00%
+- SciPy constraints valid: PASS
+
+SciPy constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 40.00%; cap: 40.00%
+PASS - Cash range: Observed: 30.00%; allowed: 10.00%-30.00%
+PASS - Equity range: Observed: 15.00%; allowed: 15.00%-35.00%
+PASS - Fixed Income range: Observed: 55.00%; allowed: 45.00%-70.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-10.00%
+PASS - SciPy solver convergence: Optimization terminated successfully
+
+Stress checks
+PASS - Expected-return haircut: Feasible. Return 6.31%, movement 2.61%.
+PASS - Covariance risk shock: Feasible. Return 7.01%, movement 2.74%.
+PASS - Largest holding removed (CWPU): Feasible. Return 7.20%, movement 3.11%.
+
+========================================================================
+Profile 3: Balanced
+Internal id: balanced
+Description: Middle-ground profile that balances a stabilizing fixed-income sleeve with meaningful growth exposure.
+
+Profile audit trace
+- Objective: max_sharpe
+- Single-asset cap: 40.00%
+- Superclass minima: {'Cash': 0.05, 'Fixed Income': 0.25, 'Equity': 0.35, 'Fund': 0.0}
+- Superclass maxima: {'Cash': 0.2, 'Fixed Income': 0.55, 'Equity': 0.65, 'Fund': 0.15}
+
+Optimized portfolio summary
+- Expected yearly return: 9.08%
+- Expected yearly movement: 4.67%
+- Estimated income: 5.44%
+- Expense ratio: 0.00%
+- Modified duration: 2.9572
+- Largest holding: 36.98%
+- Constraint valid: PASS
+
+Optimized superclass mix
+- Cash: 20.00%
+- Equity: 35.00%
+- Fixed Income: 45.00%
+
+Optimized holdings and weights
+- QPESE: 36.98% | Fixed Income | Long Government Bonds | JMD
+- TBILLJMD: 20.00% | Cash | JMD T-Bill | JMD
+- XKFZ: 8.47% | Equity | Domestic Financial Equity | JMD
+- CWPU: 8.02% | Fixed Income | Short Government Bonds | JMD
+- XPMCJ: 5.89% | Equity | Domestic Defensive Equity | JMD
+- GGOC: 4.84% | Equity | Domestic Defensive Equity | JMD
+- BQB: 4.45% | Equity | Emerging Market Equity | USD
+- IZQLN: 3.68% | Equity | Domestic Cyclical Equity | JMD
+- TIHE: 2.91% | Equity | Domestic Financial Equity | JMD
+- PDTOU: 2.68% | Equity | Domestic Defensive Equity | JMD
+- WBG: 1.75% | Equity | Global Tech Equity | USD
+- KBJZN: 0.32% | Equity | Domestic Financial Equity | JMD
+
+Constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 36.98%; cap: 40.00%
+PASS - Cash range: Observed: 20.00%; allowed: 5.00%-20.00%
+PASS - Equity range: Observed: 35.00%; allowed: 35.00%-65.00%
+PASS - Fixed Income range: Observed: 45.00%; allowed: 25.00%-55.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-15.00%
+
+Independent solver cross-check
+- Cross-check path: SciPy SLSQP cross-check
+- PyPortfolioOpt Sharpe objective: 1.9437
+- SciPy Sharpe objective: 1.9437
+- Objective gap: 0.0000
+- Largest weight difference: 0.00%
+- SciPy constraints valid: PASS
+
+SciPy constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 36.98%; cap: 40.00%
+PASS - Cash range: Observed: 20.00%; allowed: 5.00%-20.00%
+PASS - Equity range: Observed: 35.00%; allowed: 35.00%-65.00%
+PASS - Fixed Income range: Observed: 45.00%; allowed: 25.00%-55.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-15.00%
+PASS - SciPy solver convergence: Optimization terminated successfully
+
+Stress checks
+PASS - Expected-return haircut: Feasible. Return 8.17%, movement 4.67%.
+PASS - Covariance risk shock: Feasible. Return 9.08%, movement 4.90%.
+PASS - Largest holding removed (QPESE): Feasible. Return 8.18%, movement 4.58%.
+
+========================================================================
+Profile 4: Growth
+Internal id: growth
+Description: Growth-oriented profile where equity is the main allocation while fixed income and cash remain available for balance.
+
+Profile audit trace
+- Objective: max_sharpe
+- Single-asset cap: 40.00%
+- Superclass minima: {'Cash': 0.0, 'Fixed Income': 0.1, 'Equity': 0.5, 'Fund': 0.0}
+- Superclass maxima: {'Cash': 0.15, 'Fixed Income': 0.4, 'Equity': 0.85, 'Fund': 0.15}
+
+Optimized portfolio summary
+- Expected yearly return: 10.25%
+- Expected yearly movement: 6.21%
+- Estimated income: 5.30%
+- Expense ratio: 0.00%
+- Modified duration: 3.0886
+- Largest holding: 40.00%
+- Constraint valid: PASS
+
+Optimized superclass mix
+- Cash: 10.00%
+- Equity: 50.00%
+- Fixed Income: 40.00%
+
+Optimized holdings and weights
+- QPESE: 40.00% | Fixed Income | Long Government Bonds | JMD
+- XKFZ: 12.25% | Equity | Domestic Financial Equity | JMD
+- TBILLJMD: 10.00% | Cash | JMD T-Bill | JMD
+- XPMCJ: 8.12% | Equity | Domestic Defensive Equity | JMD
+- BQB: 7.22% | Equity | Emerging Market Equity | USD
+- GGOC: 7.13% | Equity | Domestic Defensive Equity | JMD
+- IZQLN: 4.93% | Equity | Domestic Cyclical Equity | JMD
+- PDTOU: 4.45% | Equity | Domestic Defensive Equity | JMD
+- TIHE: 3.78% | Equity | Domestic Financial Equity | JMD
+- WBG: 2.13% | Equity | Global Tech Equity | USD
+
+Constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 40.00%; cap: 40.00%
+PASS - Cash range: Observed: 10.00%; allowed: 0.00%-15.00%
+PASS - Equity range: Observed: 50.00%; allowed: 50.00%-85.00%
+PASS - Fixed Income range: Observed: 40.00%; allowed: 10.00%-40.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-15.00%
+
+Independent solver cross-check
+- Cross-check path: SciPy SLSQP cross-check
+- PyPortfolioOpt Sharpe objective: 1.6519
+- SciPy Sharpe objective: 1.6519
+- Objective gap: 0.0000
+- Largest weight difference: 0.00%
+- SciPy constraints valid: PASS
+
+SciPy constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 40.00%; cap: 40.00%
+PASS - Cash range: Observed: 10.00%; allowed: 0.00%-15.00%
+PASS - Equity range: Observed: 50.00%; allowed: 50.00%-85.00%
+PASS - Fixed Income range: Observed: 40.00%; allowed: 10.00%-40.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-15.00%
+PASS - SciPy solver convergence: Optimization terminated successfully
+
+Stress checks
+PASS - Expected-return haircut: Feasible. Return 9.23%, movement 6.21%.
+PASS - Covariance risk shock: Feasible. Return 10.25%, movement 6.51%.
+PASS - Largest holding removed (QPESE): Feasible. Return 9.43%, movement 6.22%.
+
+========================================================================
+Profile 5: Aggressive
+Internal id: aggressive
+Description: Highest-growth profile, allowing equity to dominate while preserving only small optional stability sleeves.
+
+Profile audit trace
+- Objective: max_sharpe
+- Single-asset cap: 40.00%
+- Superclass minima: {'Cash': 0.0, 'Fixed Income': 0.0, 'Equity': 0.7, 'Fund': 0.0}
+- Superclass maxima: {'Cash': 0.1, 'Fixed Income': 0.25, 'Equity': 1.0, 'Fund': 0.2}
+
+Optimized portfolio summary
+- Expected yearly return: 11.22%
+- Expected yearly movement: 8.44%
+- Estimated income: 4.36%
+- Expense ratio: 0.00%
+- Modified duration: 1.9304
+- Largest holding: 25.00%
+- Constraint valid: PASS
+
+Optimized superclass mix
+- Cash: 5.00%
+- Equity: 70.00%
+- Fixed Income: 25.00%
+
+Optimized holdings and weights
+- QPESE: 25.00% | Fixed Income | Long Government Bonds | JMD
+- XKFZ: 17.06% | Equity | Domestic Financial Equity | JMD
+- BQB: 12.65% | Equity | Emerging Market Equity | USD
+- XPMCJ: 10.78% | Equity | Domestic Defensive Equity | JMD
+- GGOC: 9.79% | Equity | Domestic Defensive Equity | JMD
+- PDTOU: 7.53% | Equity | Domestic Defensive Equity | JMD
+- IZQLN: 6.35% | Equity | Domestic Cyclical Equity | JMD
+- TBILLJMD: 5.00% | Cash | JMD T-Bill | JMD
+- TIHE: 3.59% | Equity | Domestic Financial Equity | JMD
+- WBG: 2.24% | Equity | Global Tech Equity | USD
+
+Constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 25.00%; cap: 40.00%
+PASS - Cash range: Observed: 5.00%; allowed: 0.00%-10.00%
+PASS - Equity range: Observed: 70.00%; allowed: 70.00%-100.00%
+PASS - Fixed Income range: Observed: 25.00%; allowed: 0.00%-25.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-20.00%
+
+Independent solver cross-check
+- Cross-check path: SciPy SLSQP cross-check
+- PyPortfolioOpt Sharpe objective: 1.3296
+- SciPy Sharpe objective: 1.3296
+- Objective gap: 0.0000
+- Largest weight difference: 0.00%
+- SciPy constraints valid: PASS
+
+SciPy constraint checks
+PASS - Weights sum to 100%: Observed total: 100.00%
+PASS - Single-asset cap: Largest holding: 25.00%; cap: 40.00%
+PASS - Cash range: Observed: 5.00%; allowed: 0.00%-10.00%
+PASS - Equity range: Observed: 70.00%; allowed: 70.00%-100.00%
+PASS - Fixed Income range: Observed: 25.00%; allowed: 0.00%-25.00%
+PASS - Fund range: Observed: 0.00%; allowed: 0.00%-20.00%
+PASS - SciPy solver convergence: Optimization terminated successfully
+
+Stress checks
+PASS - Expected-return haircut: Feasible. Return 10.09%, movement 8.44%.
+PASS - Covariance risk shock: Feasible. Return 11.22%, movement 8.85%.
+PASS - Largest holding removed (QPESE): Feasible. Return 10.93%, movement 8.43%.

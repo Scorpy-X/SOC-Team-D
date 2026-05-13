@@ -342,6 +342,9 @@ Useful references for judges and reviewers:
 ## Validation And Testing Evidence
 
 The repository includes automated tests and click-runnable validation scripts.
+For reviewers who do not want to run the scripts, a committed evidence snapshot
+is available under
+[`docs/submission/week-6-evidence/`](docs/submission/week-6-evidence/).
 
 Main commands:
 

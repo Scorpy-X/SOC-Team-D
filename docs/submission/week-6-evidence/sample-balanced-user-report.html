@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Report</title>
+  <style>
+  :root {
+    --ink: #15253a;
+    --muted: #5f7088;
+    --paper: #f3f8fc;
+    --panel: rgba(255, 255, 255, 0.76);
+    --line: #d5e0ee;
+    --accent: #4d9ae0;
+    --accent-strong: #3278c2;
+    --cash: #8ca96b;
+    --fixed-income: #4d7ba8;
+    --equity: #4b90d8;
+    --fund: #75a9db;
+    --other: #8c91a8;
+    --body-font: "Aptos", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+    --heading-font: "Aptos Display", "Segoe UI Variable Display", "Bahnschrift", "Aptos", sans-serif;
+    --number-font: "Cascadia Mono", "Consolas", "Segoe UI Mono", monospace;
+    --panel-shadow: 0 20px 46px rgba(28, 58, 92, 0.12);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 10% 4%, rgba(95, 166, 224, 0.16), transparent 28rem),
+      radial-gradient(circle at 88% 0%, rgba(150, 203, 241, 0.14), transparent 20rem),
+      linear-gradient(140deg, #f7fbff 0%, #edf5fb 48%, #f3f8fc 100%);
+    font-family: var(--body-font);
+    line-height: 1.5;
+  }
+
+  main {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 40px 0 64px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr;
+    gap: 36px;
+    min-height: 320px;
+    align-items: end;
+    padding: 48px;
+    border: 1px solid rgba(197, 220, 241, 0.3);
+    background:
+      radial-gradient(circle at top right, rgba(112, 183, 235, 0.18), transparent 15rem),
+      linear-gradient(115deg, rgba(16, 34, 56, 0.96), rgba(31, 60, 92, 0.84)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 48px);
+    color: #f4fbff;
+    border-radius: 32px;
+    box-shadow: 0 26px 70px rgba(16, 34, 56, 0.2);
+  }
+
+  .eyebrow {
+    color: #c6e1f8;
+    font: 700 0.74rem/1.2 var(--body-font);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--heading-font);
+    line-height: 1.05;
+    margin: 0;
+  }
+
+  h1 {
+    max-width: 760px;
+    margin-top: 18px;
+    font-size: clamp(2.35rem, 5vw, 4.8rem);
+    font-weight: 650;
+    letter-spacing: -0.055em;
+  }
+
+  h2 {
+    max-width: 760px;
+    font-size: clamp(1.55rem, 3vw, 2.7rem);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .hero p, .summary p {
+    max-width: 72ch;
+    color: inherit;
+    font-size: 1rem;
+  }
+
+  .hero-side {
+    border-left: 1px solid rgba(248, 244, 255, 0.18);
+    padding-left: 28px;
+  }
+
+  .hero-metric {
+    margin-top: 18px;
+  }
+
+  .hero-metric span, .metric span {
+    display: block;
+    color: var(--muted);
+    font: 700 0.68rem/1.2 var(--body-font);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-metric strong {
+    display: block;
+    color: #f4fbff;
+    font-family: var(--heading-font);
+    font-size: 1.45rem;
+    font-weight: 650;
+  }
+
+  section {
+    margin-top: 44px;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .panel {
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: var(--panel);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  .panel-subtle {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .stack {
+    display: flex;
+    height: 44px;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid rgba(77, 154, 224, 0.16);
+    background: #dfedf8;
+  }
+
+  .segment {
+    min-width: 2px;
+  }
+
+  .class-cash { background: var(--cash); }
+  .class-fixed-income { background: var(--fixed-income); }
+  .class-equity { background: var(--equity); }
+  .class-fund { background: var(--fund); }
+  .class-other { background: var(--other); }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .legend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .legend-values {
+    display: grid;
+    justify-items: end;
+    gap: 2px;
+  }
+
+  .legend-values strong,
+  .money,
+  .metric strong,
+  td.numeric {
+    font-family: var(--number-font);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .money {
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .metric {
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .metric strong {
+    display: block;
+    margin: 8px 0;
+    font-size: 1.65rem;
+    font-weight: 650;
+  }
+
+  .holdings-group {
+    display: grid;
+    grid-template-columns: minmax(150px, 220px) 1fr;
+    gap: 28px;
+    padding: 30px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .holding-row {
+    display: grid;
+    grid-template-columns: minmax(86px, 0.55fr) minmax(220px, 1.45fr) minmax(86px, 0.45fr) minmax(116px, 0.55fr);
+    gap: 18px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid rgba(213, 224, 238, 0.82);
+  }
+
+  .holding-row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .asset-code-pill {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    border: 1px solid rgba(77, 154, 224, 0.18);
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: rgba(77, 154, 224, 0.08);
+    font-family: var(--number-font);
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  .holding-detail {
+    min-width: 0;
+  }
+
+  .holding-detail strong {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .holding-detail span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  .holding-value {
+    justify-self: end;
+    text-align: right;
+  }
+
+  .mini-bar {
+    height: 10px;
+    border-radius: 999px;
+    background: #dfedf8;
+    overflow: hidden;
+  }
+
+  .mini-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--body-font);
+    font-size: 0.84rem;
+  }
+
+  th, td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  th {
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  td.numeric {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .note-list {
+    padding-left: 1rem;
+  }
+
+  .audit {
+    background: #132235;
+    color: #f4fbff;
+  }
+
+  .audit .panel,
+  .audit table,
+  .audit th,
+  .audit td {
+    border-color: rgba(247, 237, 219, 0.22);
+  }
+
+  pre {
+    overflow: auto;
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(12, 28, 46, 0.36);
+    color: #f4fbff;
+  }
+
+  @media (max-width: 760px) {
+    main {
+      width: min(100% - 20px, 1120px);
+      padding-top: 10px;
+    }
+
+    .hero,
+    .summary,
+    .holdings-group {
+      grid-template-columns: 1fr;
+    }
+
+    .hero {
+      padding: 28px;
+      border-radius: 24px;
+    }
+
+    .hero-side {
+      border-left: 0;
+      border-top: 1px solid rgba(255, 248, 232, 0.22);
+      padding-left: 0;
+      padding-top: 20px;
+    }
+
+    .holding-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .holding-value {
+      justify-self: start;
+      text-align: left;
+    }
+  }
+</style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Prepared for review</div>
+        <h1>Balanced portfolio report</h1>
+        <p>This report presents a proposed Balanced allocation. It summarizes the recommended investment mix, key portfolio estimates, and the investments included for review.</p>
+      </div>
+      <div class="hero-side">
+        <div class="hero-metric">
+          <span>Portfolio value</span>
+          <strong>$800,000.00</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Recommendation basis</span>
+          <strong>Calculated from questionnaire</strong>
+        </div>
+
+        <div class="hero-metric">
+          <span>Risk score</span>
+          <strong>5 / 10</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Investor type</span>
+          <strong>Balanced</strong>
+        </div>
+
+        <div class="hero-metric">
+          <span>Generated</span>
+          <strong>2026-05-13 13:46 UTC</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Portfolio Mix</div>
+        <h2>Broad investment mix first.</h2>
+      </div>
+      <div class="panel">
+        <div class="stack" aria-label="Portfolio investment type mix">
+
+          <div
+            class="segment class-cash"
+            title="Cash 20.0%"
+            style="width: 20.0%">
+          </div>
+
+          <div
+            class="segment class-fixed-income"
+            title="Fixed Income 45.0%"
+            style="width: 44.99999999999999%">
+          </div>
+
+          <div
+            class="segment class-equity"
+            title="Equity 35.0%"
+            style="width: 35.0%">
+          </div>
+
+        </div>
+        <div class="legend">
+
+          <div class="legend-item">
+            <span>Cash</span>
+            <span class="legend-values">
+              <strong>20.0%</strong>
+
+              <span class="money">$160,000.00</span>
+
+            </span>
+          </div>
+
+          <div class="legend-item">
+            <span>Fixed Income</span>
+            <span class="legend-values">
+              <strong>45.0%</strong>
+
+              <span class="money">$360,000.00</span>
+
+            </span>
+          </div>
+
+          <div class="legend-item">
+            <span>Equity</span>
+            <span class="legend-values">
+              <strong>35.0%</strong>
+
+              <span class="money">$280,000.00</span>
+
+            </span>
+          </div>
+
+        </div>
+        <p>The current allocation is Cash 20.0%, Fixed Income 45.0%, Equity 35.0%. The expected annual return is 9.1% and the annual volatility is 4.7%. Currency exposure is JMD 93.8%, USD 6.2%.</p>
+      </div>
+    </section>
+
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Recommendation basis</div>
+        <h2>Why this investor profile was used.</h2>
+      </div>
+      <div class="panel">
+        <ul class="note-list">
+
+          <li>Balanced means the portfolio keeps a mix of stability and growth exposure.</li>
+
+          <li>Risk capacity: low. The financial situation and time horizon answers suggest limited ability to take investment risk.</li>
+
+          <li>Risk tolerance: medium. The market-decline and loss-comfort answers suggest moderate comfort with short-term portfolio movement.</li>
+
+          <li>Decision: the system selected Balanced because the capacity and tolerance answers together support a middle profile.</li>
+
+          <li>Technical note: capacity 39.5%, tolerance 58.3%, displayed risk score 5 / 10.</li>
+
+          <li>Liquidity need: low. The selected profile could support the required Cash reserve without adjustment.</li>
+
+        </ul>
+      </div>
+    </section>
+
+
+    <section>
+      <div class="eyebrow">Metrics</div>
+      <h2>Key portfolio metrics.</h2>
+      <div class="metric-grid">
+
+        <div class="metric">
+          <span>Expected annual return</span>
+          <strong>9.1%</strong>
+
+          <div class="money">$72,609.02 based on $800,000.00</div>
+
+          <p>A model estimate of possible yearly growth. This is not guaranteed.</p>
+        </div>
+
+        <div class="metric">
+          <span>Annual volatility</span>
+          <strong>4.7%</strong>
+
+          <div class="money">$37,356.71 based on $800,000.00</div>
+
+          <p>A risk scale estimate for year-to-year portfolio movement, not a worst-case loss.</p>
+        </div>
+
+        <div class="metric">
+          <span>Income yield</span>
+          <strong>5.4%</strong>
+
+          <div class="money">$43,538.81 based on $800,000.00</div>
+
+          <p>Estimated interest or dividend income before price changes.</p>
+        </div>
+
+        <div class="metric">
+          <span>Estimated fund costs</span>
+          <strong>0.00%</strong>
+
+          <div class="money">$0.00 based on $800,000.00</div>
+
+          <p>No meaningful fund fee estimate was found in the selected assets.</p>
+        </div>
+
+        <div class="metric">
+          <span>Interest-rate exposure</span>
+          <strong>2.96</strong>
+
+          <p>Mainly matters for bond-like holdings; higher values mean more rate sensitivity.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Currency Exposure</div>
+        <h2>Where the money is denominated.</h2>
+      </div>
+      <div class="panel">
+
+        <div class="legend-item">
+          <span>JMD</span>
+          <span class="legend-values">
+            <strong>93.8%</strong>
+
+            <span class="money">$750,422.40</span>
+
+          </span>
+        </div>
+
+        <div class="legend-item">
+          <span>USD</span>
+          <span class="legend-values">
+            <strong>6.2%</strong>
+
+            <span class="money">$49,577.60</span>
+
+          </span>
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Investments</div>
+      <h2>Investments grouped by type.</h2>
+      <p class="panel-subtle">Asset codes are the short market identifiers used to refer to each investment.</p>
+
+      <div class="holdings-group">
+        <div>
+          <h3>Cash</h3>
+          <p>20.0% of the portfolio</p>
+        </div>
+        <div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">TBILLJMD</span></div>
+            <div class="holding-detail">
+              <strong>JMD T-Bill</strong>
+              <span>JMD / Cash</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 20.0%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>20.0%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$160,000.00</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="holdings-group">
+        <div>
+          <h3>Fixed Income</h3>
+          <p>45.0% of the portfolio</p>
+        </div>
+        <div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">QPESE</span></div>
+            <div class="holding-detail">
+              <strong>Long Government Bonds</strong>
+              <span>JMD / Fixed Income</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 36.9768%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>37.0%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$295,814.40</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">CWPU</span></div>
+            <div class="holding-detail">
+              <strong>Short Government Bonds</strong>
+              <span>JMD / Fixed Income</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 8.0232%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>8.0%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$64,185.60</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="holdings-group">
+        <div>
+          <h3>Equity</h3>
+          <p>35.0% of the portfolio</p>
+        </div>
+        <div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">XKFZ</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Financial Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 8.4712%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>8.5%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$67,769.60</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">XPMCJ</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Defensive Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 5.8931%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>5.9%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$47,144.80</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">GGOC</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Defensive Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 4.8429%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>4.8%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$38,743.20</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">BQB</span></div>
+            <div class="holding-detail">
+              <strong>Emerging Market Equity</strong>
+              <span>USD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 4.448300000000001%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>4.4%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$35,586.40</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">IZQLN</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Cyclical Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 3.6813%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>3.7%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$29,450.40</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">TIHE</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Financial Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 2.9145%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>2.9%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$23,316.00</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">PDTOU</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Defensive Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 2.6799%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>2.7%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$21,439.20</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">WBG</span></div>
+            <div class="holding-detail">
+              <strong>Global Tech Equity</strong>
+              <span>USD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 1.7489000000000001%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>1.7%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$13,991.20</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+          <div class="holding-row">
+            <div><span class="asset-code-pill">KBJZN</span></div>
+            <div class="holding-detail">
+              <strong>Domestic Financial Equity</strong>
+              <span>JMD / Equity</span>
+              <div class="mini-bar">
+                <div class="mini-fill" style="width: 1.0%"></div>
+              </div>
+            </div>
+            <div class="holding-value">
+              <strong>0.3%</strong>
+              <div class="money">portfolio weight</div>
+            </div>
+            <div class="holding-value">
+
+              <strong>$2,559.20</strong>
+              <div class="money">estimated amount</div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <section>
+      <div class="eyebrow">Concentration Check</div>
+      <h2>How much is concentrated in the largest investments.</h2>
+      <div class="metric-grid">
+        <div class="metric">
+          <span>Largest investment</span>
+
+          <strong>QPESE 37.0%</strong>
+
+          <div class="money">$295,814.40 based on $800,000.00</div>
+
+          <p>Long Government Bonds / JMD</p>
+
+        </div>
+        <div class="metric">
+          <span>Top 3 investments</span>
+          <strong>65.4%</strong>
+
+          <div class="money">$523,584.00 based on $800,000.00</div>
+
+          <p>Combined weight of the three largest investments.</p>
+        </div>
+        <div class="metric">
+          <span>Top 5 investments</span>
+          <strong>79.4%</strong>
+
+          <div class="money">$634,914.40 based on $800,000.00</div>
+
+          <p>Combined weight of the five largest investments.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Risk reality check</div>
+        <h2>A plain-language stress estimate.</h2>
+      </div>
+      <div class="panel">
+        <p>
+          Before this report was generated, the system showed a rough volatility stress estimate based on the proposed portfolio's annual volatility.
+          The estimate used annual volatility of 4.7% and showed a potential portfolio loss of 9.3% under that stress estimate.
+
+          On the portfolio value provided, that potential loss is about $74,713.42.
+
+        </p>
+        <p>
+          This simplified estimate supports the review conversation. It is not a prediction, formal risk model, or guaranteed limit.
+        </p>
+      </div>
+    </section>
+
+
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Liquidity check</div>
+        <h2>Cash needs were checked before the report.</h2>
+      </div>
+      <div class="panel">
+        <p>
+          Before building this report, the system checked whether the selected profile could support the near-term Cash need from your answers.
+          The estimated Cash reserve was $0.00, or 0.0% of the portfolio value entered.
+        </p>
+
+        <ul class="note-list">
+
+          <li>Required liquidity was calculated as expected major withdrawals plus essential monthly expenses multiplied by the selected emergency reserve.</li>
+
+          <li>The required Cash reserve was $0.00, or 0.0% of the portfolio value entered.</li>
+
+        </ul>
+
+
+      </div>
+    </section>
+
+
+    <section>
+      <div class="eyebrow">Full investment list</div>
+      <h2>All investments included in this proposed portfolio.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Asset code</th>
+            <th>Investment type</th>
+            <th>Asset class</th>
+            <th>Currency</th>
+            <th>Weight</th>
+            <th>Estimated amount</th>
+            <th>Estimated yearly return</th>
+            <th>Estimated income</th>
+            <th>Annual volatility</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>TBILLJMD</td>
+            <td>Cash</td>
+            <td>JMD T-Bill</td>
+            <td>JMD</td>
+            <td class="numeric">20.0%</td>
+            <td class="numeric">$160,000.00</td>
+            <td class="numeric">4.9%</td>
+            <td class="numeric">3.8%</td>
+            <td class="numeric">1.2%</td>
+          </tr>
+
+          <tr>
+            <td>QPESE</td>
+            <td>Fixed Income</td>
+            <td>Long Government Bonds</td>
+            <td>JMD</td>
+            <td class="numeric">37.0%</td>
+            <td class="numeric">$295,814.40</td>
+            <td class="numeric">8.8%</td>
+            <td class="numeric">8.8%</td>
+            <td class="numeric">7.5%</td>
+          </tr>
+
+          <tr>
+            <td>CWPU</td>
+            <td>Fixed Income</td>
+            <td>Short Government Bonds</td>
+            <td>JMD</td>
+            <td class="numeric">8.0%</td>
+            <td class="numeric">$64,185.60</td>
+            <td class="numeric">5.8%</td>
+            <td class="numeric">5.8%</td>
+            <td class="numeric">2.4%</td>
+          </tr>
+
+          <tr>
+            <td>XKFZ</td>
+            <td>Equity</td>
+            <td>Domestic Financial Equity</td>
+            <td>JMD</td>
+            <td class="numeric">8.5%</td>
+            <td class="numeric">$67,769.60</td>
+            <td class="numeric">12.1%</td>
+            <td class="numeric">2.2%</td>
+            <td class="numeric">17.4%</td>
+          </tr>
+
+          <tr>
+            <td>XPMCJ</td>
+            <td>Equity</td>
+            <td>Domestic Defensive Equity</td>
+            <td>JMD</td>
+            <td class="numeric">5.9%</td>
+            <td class="numeric">$47,144.80</td>
+            <td class="numeric">11.2%</td>
+            <td class="numeric">5.0%</td>
+            <td class="numeric">16.6%</td>
+          </tr>
+
+          <tr>
+            <td>GGOC</td>
+            <td>Equity</td>
+            <td>Domestic Defensive Equity</td>
+            <td>JMD</td>
+            <td class="numeric">4.8%</td>
+            <td class="numeric">$38,743.20</td>
+            <td class="numeric">10.2%</td>
+            <td class="numeric">4.9%</td>
+            <td class="numeric">15.2%</td>
+          </tr>
+
+          <tr>
+            <td>BQB</td>
+            <td>Equity</td>
+            <td>Emerging Market Equity</td>
+            <td>USD</td>
+            <td class="numeric">4.4%</td>
+            <td class="numeric">$35,586.40</td>
+            <td class="numeric">15.5%</td>
+            <td class="numeric">0.0%</td>
+            <td class="numeric">20.7%</td>
+          </tr>
+
+          <tr>
+            <td>IZQLN</td>
+            <td>Equity</td>
+            <td>Domestic Cyclical Equity</td>
+            <td>JMD</td>
+            <td class="numeric">3.7%</td>
+            <td class="numeric">$29,450.40</td>
+            <td class="numeric">13.8%</td>
+            <td class="numeric">1.1%</td>
+            <td class="numeric">18.1%</td>
+          </tr>
+
+          <tr>
+            <td>TIHE</td>
+            <td>Equity</td>
+            <td>Domestic Financial Equity</td>
+            <td>JMD</td>
+            <td class="numeric">2.9%</td>
+            <td class="numeric">$23,316.00</td>
+            <td class="numeric">12.3%</td>
+            <td class="numeric">2.0%</td>
+            <td class="numeric">19.0%</td>
+          </tr>
+
+          <tr>
+            <td>PDTOU</td>
+            <td>Equity</td>
+            <td>Domestic Defensive Equity</td>
+            <td>JMD</td>
+            <td class="numeric">2.7%</td>
+            <td class="numeric">$21,439.20</td>
+            <td class="numeric">11.0%</td>
+            <td class="numeric">5.8%</td>
+            <td class="numeric">16.8%</td>
+          </tr>
+
+          <tr>
+            <td>WBG</td>
+            <td>Equity</td>
+            <td>Global Tech Equity</td>
+            <td>USD</td>
+            <td class="numeric">1.7%</td>
+            <td class="numeric">$13,991.20</td>
+            <td class="numeric">17.6%</td>
+            <td class="numeric">0.0%</td>
+            <td class="numeric">25.1%</td>
+          </tr>
+
+          <tr>
+            <td>KBJZN</td>
+            <td>Equity</td>
+            <td>Domestic Financial Equity</td>
+            <td>JMD</td>
+            <td class="numeric">0.3%</td>
+            <td class="numeric">$2,559.20</td>
+            <td class="numeric">12.2%</td>
+            <td class="numeric">0.0%</td>
+            <td class="numeric">20.2%</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </section>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Important Limits</div>
+        <h2>What this report cannot promise.</h2>
+      </div>
+      <div class="panel">
+        <p>This SOC advisor prototype report is prepared for review and is not final regulated financial advice. The liquidity answers are used for a Cash reserve check, but the full suitability model is still under development. Expected returns are estimates rather than guarantees.</p>
+        <ul class="note-list">
+
+          <li>The questionnaire calculates a proposed investor profile, and advisor review can still adjust it during the prototype.</li>
+
+          <li>The money amount answers are used to check the minimum Cash reserve before the portfolio is built.</li>
+
+          <li>Expected returns are estimates, not guarantees.</li>
+
+          <li>The system checks the input data for numerical stability before building the portfolio; this does not change the investment policy.</li>
+
+        </ul>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

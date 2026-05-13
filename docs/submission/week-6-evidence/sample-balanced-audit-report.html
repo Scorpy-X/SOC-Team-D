@@ -1,0 +1,1718 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SOC Portfolio Audit Report</title>
+  <style>
+  :root {
+    --ink: #15253a;
+    --muted: #5f7088;
+    --paper: #f3f8fc;
+    --panel: rgba(255, 255, 255, 0.76);
+    --line: #d5e0ee;
+    --accent: #4d9ae0;
+    --accent-strong: #3278c2;
+    --cash: #8ca96b;
+    --fixed-income: #4d7ba8;
+    --equity: #4b90d8;
+    --fund: #75a9db;
+    --other: #8c91a8;
+    --body-font: "Aptos", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+    --heading-font: "Aptos Display", "Segoe UI Variable Display", "Bahnschrift", "Aptos", sans-serif;
+    --number-font: "Cascadia Mono", "Consolas", "Segoe UI Mono", monospace;
+    --panel-shadow: 0 20px 46px rgba(28, 58, 92, 0.12);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 10% 4%, rgba(95, 166, 224, 0.16), transparent 28rem),
+      radial-gradient(circle at 88% 0%, rgba(150, 203, 241, 0.14), transparent 20rem),
+      linear-gradient(140deg, #f7fbff 0%, #edf5fb 48%, #f3f8fc 100%);
+    font-family: var(--body-font);
+    line-height: 1.5;
+  }
+
+  main {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 40px 0 64px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr;
+    gap: 36px;
+    min-height: 320px;
+    align-items: end;
+    padding: 48px;
+    border: 1px solid rgba(197, 220, 241, 0.3);
+    background:
+      radial-gradient(circle at top right, rgba(112, 183, 235, 0.18), transparent 15rem),
+      linear-gradient(115deg, rgba(16, 34, 56, 0.96), rgba(31, 60, 92, 0.84)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 48px);
+    color: #f4fbff;
+    border-radius: 32px;
+    box-shadow: 0 26px 70px rgba(16, 34, 56, 0.2);
+  }
+
+  .eyebrow {
+    color: #c6e1f8;
+    font: 700 0.74rem/1.2 var(--body-font);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--heading-font);
+    line-height: 1.05;
+    margin: 0;
+  }
+
+  h1 {
+    max-width: 760px;
+    margin-top: 18px;
+    font-size: clamp(2.35rem, 5vw, 4.8rem);
+    font-weight: 650;
+    letter-spacing: -0.055em;
+  }
+
+  h2 {
+    max-width: 760px;
+    font-size: clamp(1.55rem, 3vw, 2.7rem);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .hero p, .summary p {
+    max-width: 72ch;
+    color: inherit;
+    font-size: 1rem;
+  }
+
+  .hero-side {
+    border-left: 1px solid rgba(248, 244, 255, 0.18);
+    padding-left: 28px;
+  }
+
+  .hero-metric {
+    margin-top: 18px;
+  }
+
+  .hero-metric span, .metric span {
+    display: block;
+    color: var(--muted);
+    font: 700 0.68rem/1.2 var(--body-font);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-metric strong {
+    display: block;
+    color: #f4fbff;
+    font-family: var(--heading-font);
+    font-size: 1.45rem;
+    font-weight: 650;
+  }
+
+  section {
+    margin-top: 44px;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .panel {
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: var(--panel);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  .panel-subtle {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .stack {
+    display: flex;
+    height: 44px;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid rgba(77, 154, 224, 0.16);
+    background: #dfedf8;
+  }
+
+  .segment {
+    min-width: 2px;
+  }
+
+  .class-cash { background: var(--cash); }
+  .class-fixed-income { background: var(--fixed-income); }
+  .class-equity { background: var(--equity); }
+  .class-fund { background: var(--fund); }
+  .class-other { background: var(--other); }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .legend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .legend-values {
+    display: grid;
+    justify-items: end;
+    gap: 2px;
+  }
+
+  .legend-values strong,
+  .money,
+  .metric strong,
+  td.numeric {
+    font-family: var(--number-font);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .money {
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .metric {
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .metric strong {
+    display: block;
+    margin: 8px 0;
+    font-size: 1.65rem;
+    font-weight: 650;
+  }
+
+  .holdings-group {
+    display: grid;
+    grid-template-columns: minmax(150px, 220px) 1fr;
+    gap: 28px;
+    padding: 30px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .holding-row {
+    display: grid;
+    grid-template-columns: minmax(86px, 0.55fr) minmax(220px, 1.45fr) minmax(86px, 0.45fr) minmax(116px, 0.55fr);
+    gap: 18px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid rgba(213, 224, 238, 0.82);
+  }
+
+  .holding-row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .asset-code-pill {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    border: 1px solid rgba(77, 154, 224, 0.18);
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: rgba(77, 154, 224, 0.08);
+    font-family: var(--number-font);
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  .holding-detail {
+    min-width: 0;
+  }
+
+  .holding-detail strong {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .holding-detail span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  .holding-value {
+    justify-self: end;
+    text-align: right;
+  }
+
+  .mini-bar {
+    height: 10px;
+    border-radius: 999px;
+    background: #dfedf8;
+    overflow: hidden;
+  }
+
+  .mini-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--body-font);
+    font-size: 0.84rem;
+  }
+
+  th, td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  th {
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  td.numeric {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .note-list {
+    padding-left: 1rem;
+  }
+
+  .audit {
+    background: #132235;
+    color: #f4fbff;
+  }
+
+  .audit .panel,
+  .audit table,
+  .audit th,
+  .audit td {
+    border-color: rgba(247, 237, 219, 0.22);
+  }
+
+  pre {
+    overflow: auto;
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(12, 28, 46, 0.36);
+    color: #f4fbff;
+  }
+
+  @media (max-width: 760px) {
+    main {
+      width: min(100% - 20px, 1120px);
+      padding-top: 10px;
+    }
+
+    .hero,
+    .summary,
+    .holdings-group {
+      grid-template-columns: 1fr;
+    }
+
+    .hero {
+      padding: 28px;
+      border-radius: 24px;
+    }
+
+    .hero-side {
+      border-left: 0;
+      border-top: 1px solid rgba(255, 248, 232, 0.22);
+      padding-left: 0;
+      padding-top: 20px;
+    }
+
+    .holding-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .holding-value {
+      justify-self: start;
+      text-align: left;
+    }
+  }
+</style>
+</head>
+<body class="audit">
+  <main>
+    <header class="hero">
+      <div>
+        <div class="eyebrow">SOC Advisor Prototype / Audit Copy</div>
+        <h1>Balanced decision trace</h1>
+        <p>This report presents a proposed Balanced allocation. It summarizes the recommended investment mix, key portfolio estimates, and the investments included for review.</p>
+      </div>
+      <div class="hero-side">
+        <div class="hero-metric">
+          <span>Portfolio value</span>
+          <strong>$800,000.00</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Session</span>
+          <strong>balanced</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Generated</span>
+          <strong>2026-05-13 13:46 UTC</strong>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="eyebrow">User-Facing Summary</div>
+      <h2>Same portfolio facts the client report sees.</h2>
+      <div class="metric-grid">
+
+        <div class="metric">
+          <span>Expected annual return</span>
+          <strong>9.1%</strong>
+
+          <div class="money">$72,609.02 based on $800,000.00</div>
+
+          <p>A model estimate of possible yearly growth. This is not guaranteed.</p>
+        </div>
+
+        <div class="metric">
+          <span>Annual volatility</span>
+          <strong>4.7%</strong>
+
+          <div class="money">$37,356.71 based on $800,000.00</div>
+
+          <p>A risk scale estimate for year-to-year portfolio movement, not a worst-case loss.</p>
+        </div>
+
+        <div class="metric">
+          <span>Income yield</span>
+          <strong>5.4%</strong>
+
+          <div class="money">$43,538.81 based on $800,000.00</div>
+
+          <p>Estimated interest or dividend income before price changes.</p>
+        </div>
+
+        <div class="metric">
+          <span>Estimated fund costs</span>
+          <strong>0.00%</strong>
+
+          <div class="money">$0.00 based on $800,000.00</div>
+
+          <p>No meaningful fund fee estimate was found in the selected assets.</p>
+        </div>
+
+        <div class="metric">
+          <span>Interest-rate exposure</span>
+          <strong>2.96</strong>
+
+          <p>Mainly matters for bond-like holdings; higher values mean more rate sensitivity.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Technical Risk Signals</div>
+      <h2>Sensitivity values kept for audit and debugging.</h2>
+      <div class="metric-grid">
+
+        <div class="metric">
+          <span>Rate beta</span>
+          <strong>-3.14</strong>
+          <p>Estimated sensitivity to interest-rate moves.</p>
+        </div>
+
+        <div class="metric">
+          <span>Inflation beta</span>
+          <strong>-0.40</strong>
+          <p>Estimated sensitivity to inflation changes.</p>
+        </div>
+
+        <div class="metric">
+          <span>FX beta</span>
+          <strong>0.06</strong>
+          <p>Estimated foreign-exchange sensitivity.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="summary">
+      <div>
+        <div class="eyebrow">Superclass Mix</div>
+        <h2>Allocation grouped by broad asset bucket.</h2>
+      </div>
+      <div class="panel">
+        <div class="stack" aria-label="Portfolio superclass allocation">
+
+          <div
+            class="segment class-cash"
+            title="Cash 20.0%"
+            style="width: 20.0%">
+          </div>
+
+          <div
+            class="segment class-fixed-income"
+            title="Fixed Income 45.0%"
+            style="width: 44.99999999999999%">
+          </div>
+
+          <div
+            class="segment class-equity"
+            title="Equity 35.0%"
+            style="width: 35.0%">
+          </div>
+
+        </div>
+        <div class="legend">
+
+          <div class="legend-item">
+            <span>Cash</span>
+            <span class="legend-values">
+              <strong>20.0%</strong>
+
+              <span class="money">$160,000.00</span>
+
+            </span>
+          </div>
+
+          <div class="legend-item">
+            <span>Fixed Income</span>
+            <span class="legend-values">
+              <strong>45.0%</strong>
+
+              <span class="money">$360,000.00</span>
+
+            </span>
+          </div>
+
+          <div class="legend-item">
+            <span>Equity</span>
+            <span class="legend-values">
+              <strong>35.0%</strong>
+
+              <span class="money">$280,000.00</span>
+
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Full Holdings</div>
+      <h2>Every holding selected by the optimizer.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Superclass</th>
+            <th>Asset class</th>
+            <th>Currency</th>
+            <th>Weight</th>
+            <th>Est. allocation</th>
+            <th>Est. return</th>
+            <th>Income yield</th>
+            <th>Volatility</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>TBILLJMD</td>
+            <td>Cash</td>
+            <td>JMD T-Bill</td>
+            <td>JMD</td>
+            <td class="numeric">20.0%</td>
+            <td class="numeric">$160,000.00</td>
+            <td class="numeric">4.9%</td>
+            <td class="numeric">3.8%</td>
+            <td class="numeric">1.2%</td>
+          </tr>
+
+          <tr>
+            <td>QPESE</td>
+            <td>Fixed Income</td>
+            <td>Long Government Bonds</td>
+            <td>JMD</td>
+            <td class="numeric">37.0%</td>
+            <td class="numeric">$295,814.40</td>
+            <td class="numeric">8.8%</td>
+            <td class="numeric">8.8%</td>
+            <td class="numeric">7.5%</td>
+          </tr>
+
+          <tr>
+            <td>CWPU</td>
+            <td>Fixed Income</td>
+            <td>Short Government Bonds</td>
+            <td>JMD</td>
+            <td class="numeric">8.0%</td>
+            <td class="numeric">$64,185.60</td>
+            <td class="numeric">5.8%</td>
+            <td class="numeric">5.8%</td>
+            <td class="numeric">2.4%</td>
+          </tr>
+
+          <tr>
+            <td>XKFZ</td>
+            <td>Equity</td>
+            <td>Domestic Financial Equity</td>
+            <td>JMD</td>
+            <td class="numeric">8.5%</td>
+            <td class="numeric">$67,769.60</td>
+            <td class="numeric">12.1%</td>
+            <td class="numeric">2.2%</td>
+            <td class="numeric">17.4%</td>
+          </tr>
+
+          <tr>
+            <td>XPMCJ</td>
+            <td>Equity</td>
+            <td>Domestic Defensive Equity</td>
+            <td>JMD</td>
+            <td class="numeric">5.9%</td>
+            <td class="numeric">$47,144.80</td>
+            <td class="numeric">11.2%</td>
+            <td class="numeric">5.0%</td>
+            <td class="numeric">16.6%</td>
+          </tr>
+
+          <tr>
+            <td>GGOC</td>
+            <td>Equity</td>
+            <td>Domestic Defensive Equity</td>
+            <td>JMD</td>
+            <td class="numeric">4.8%</td>
+            <td class="numeric">$38,743.20</td>
+            <td class="numeric">10.2%</td>
+            <td class="numeric">4.9%</td>
+            <td class="numeric">15.2%</td>
+          </tr>
+
+          <tr>
+            <td>BQB</td>
+            <td>Equity</td>
+            <td>Emerging Market Equity</td>
+            <td>USD</td>
+            <td class="numeric">4.4%</td>
+            <td class="numeric">$35,586.40</td>
+            <td class="numeric">15.5%</td>
+            <td class="numeric">0.0%</td>
+            <td class="numeric">20.7%</td>
+          </tr>
+
+          <tr>
+            <td>IZQLN</td>
+            <td>Equity</td>
+            <td>Domestic Cyclical Equity</td>
+            <td>JMD</td>
+            <td class="numeric">3.7%</td>
+            <td class="numeric">$29,450.40</td>
+            <td class="numeric">13.8%</td>
+            <td class="numeric">1.1%</td>
+            <td class="numeric">18.1%</td>
+          </tr>
+
+          <tr>
+            <td>TIHE</td>
+            <td>Equity</td>
+            <td>Domestic Financial Equity</td>
+            <td>JMD</td>
+            <td class="numeric">2.9%</td>
+            <td class="numeric">$23,316.00</td>
+            <td class="numeric">12.3%</td>
+            <td class="numeric">2.0%</td>
+            <td class="numeric">19.0%</td>
+          </tr>
+
+          <tr>
+            <td>PDTOU</td>
+            <td>Equity</td>
+            <td>Domestic Defensive Equity</td>
+            <td>JMD</td>
+            <td class="numeric">2.7%</td>
+            <td class="numeric">$21,439.20</td>
+            <td class="numeric">11.0%</td>
+            <td class="numeric">5.8%</td>
+            <td class="numeric">16.8%</td>
+          </tr>
+
+          <tr>
+            <td>WBG</td>
+            <td>Equity</td>
+            <td>Global Tech Equity</td>
+            <td>USD</td>
+            <td class="numeric">1.7%</td>
+            <td class="numeric">$13,991.20</td>
+            <td class="numeric">17.6%</td>
+            <td class="numeric">0.0%</td>
+            <td class="numeric">25.1%</td>
+          </tr>
+
+          <tr>
+            <td>KBJZN</td>
+            <td>Equity</td>
+            <td>Domestic Financial Equity</td>
+            <td>JMD</td>
+            <td class="numeric">0.3%</td>
+            <td class="numeric">$2,559.20</td>
+            <td class="numeric">12.2%</td>
+            <td class="numeric">0.0%</td>
+            <td class="numeric">20.2%</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <div class="eyebrow">Decision Trace</div>
+      <h2>What produced this result.</h2>
+      <table>
+        <tbody>
+
+          <tr>
+            <th>Questionnaire</th>
+            <td>v4</td>
+          </tr>
+
+          <tr>
+            <th>Scoring policy</th>
+            <td>v5</td>
+          </tr>
+
+          <tr>
+            <th>Portfolio policy</th>
+            <td>v3</td>
+          </tr>
+
+          <tr>
+            <th>Profile source</th>
+            <td>scored_questionnaire</td>
+          </tr>
+
+          <tr>
+            <th>Final profile</th>
+            <td>Balanced (balanced)</td>
+          </tr>
+
+          <tr>
+            <th>Data source</th>
+            <td>Saved CSV snapshot</td>
+          </tr>
+
+          <tr>
+            <th>Optimizer objective</th>
+            <td>max_sharpe</td>
+          </tr>
+
+          <tr>
+            <th>Risk-free rate</th>
+            <td>0.0%</td>
+          </tr>
+
+          <tr>
+            <th>Weight bounds</th>
+            <td>0.0% to 40.0%</td>
+          </tr>
+
+          <tr>
+            <th>Single asset cap</th>
+            <td>40.0%</td>
+          </tr>
+
+          <tr>
+            <th>Covariance PSD repair</th>
+            <td>Enabled</td>
+          </tr>
+
+          <tr>
+            <th>Applied overlays</th>
+            <td>liquidity_cash_floor:0.050000</td>
+          </tr>
+
+          <tr>
+            <th>Report prose</th>
+            <td>deterministic</td>
+          </tr>
+
+          <tr>
+            <th>Scoring method</th>
+            <td>weighted_normalized_sections</td>
+          </tr>
+
+          <tr>
+            <th>Capacity score</th>
+            <td>39.5%</td>
+          </tr>
+
+          <tr>
+            <th>Tolerance score</th>
+            <td>58.3%</td>
+          </tr>
+
+          <tr>
+            <th>Score before caps</th>
+            <td>47.0%</td>
+          </tr>
+
+          <tr>
+            <th>Score after caps</th>
+            <td>47.0%</td>
+          </tr>
+
+          <tr>
+            <th>Displayed risk score</th>
+            <td>5 / 10</td>
+          </tr>
+
+          <tr>
+            <th>Scoring cap applied</th>
+            <td>None</td>
+          </tr>
+
+          <tr>
+            <th>Liquidity required</th>
+            <td>$0.00</td>
+          </tr>
+
+          <tr>
+            <th>Liquidity floor</th>
+            <td>0.0%</td>
+          </tr>
+
+          <tr>
+            <th>Liquidity profile action</th>
+            <td>submitted_compatible_profile</td>
+          </tr>
+
+          <tr>
+            <th>Risk reality method</th>
+            <td>two_standard_deviation_volatility_proxy</td>
+          </tr>
+
+          <tr>
+            <th>Risk reality multiplier</th>
+            <td>2.0</td>
+          </tr>
+
+          <tr>
+            <th>Risk reality user action</th>
+            <td>continued_current_profile</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </section>
+
+
+    <section>
+      <div class="eyebrow">Chronological Calculation Trail</div>
+      <h2>Formula path from answers to portfolio.</h2>
+      <div class="summary">
+
+        <div class="panel">
+          <h3>1. Liquidity need</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>required liquidity = major expense withdrawal + monthly expenses × emergency months</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>$0.00 + $0.00 × 0.0 = $0.00</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Required liquidity: $0.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>2. Liquidity floor</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>liquidity floor = required liquidity / portfolio value</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>$0.00 / $800,000.00 = 0.0%</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Minimum Cash need: 0.0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>3. Risk capacity score</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>capacity score = weighted average of Q5-Q9</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>Question weights and normalized answer scores are shown in the scoring policy table below.</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>39.5%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>4. Risk tolerance score</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>tolerance score = weighted average of Q10-Q14</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>Question weights and normalized answer scores are shown in the scoring policy table below.</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>58.3%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>5. Final questionnaire score</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>final score = 60% × capacity score + 40% × tolerance score</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>60% × 39.5% + 40% × 58.3% = 47.0%</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Draft profile: Balanced</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>6. Profile bucket and cap rule</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>score range maps to investor profile; if Q10 = sell everything, max profile = Balanced</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>0.00-0.20 Very Conservative; 0.20-0.40 Conservative; 0.40-0.60 Balanced; 0.60-0.80 Growth; 0.80-1.00 Aggressive</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Final scoring profile: Balanced; displayed risk score 5 / 10. No scoring cap applied.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>7. Liquidity compatibility</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>if liquidity floor &gt; selected profile Cash max, use nearest safer compatible profile</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>0.0% compared with selected Cash ceiling 20.0%</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>selected profile compatible</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>8. Cash floor overlay</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>effective Cash minimum = max(configured Cash minimum, liquidity floor)</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>Configured minima: Cash 5.0%, Fixed Income 25.0%, Equity 35.0%, Fund 0.0%; liquidity floor 0.0%</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>liquidity_cash_floor:0.050000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>9. Optimizer objective</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>maximize Sharpe ratio</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>objective=max_sharpe; risk-free rate=0.0%</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>PyPortfolioOpt solves inside the approved constraints.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>10. Optimizer inputs</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>mu = expected returns; S = covariance matrix</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>12 selected nonzero holdings; data source=Saved CSV snapshot; PSD repair=enabled</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Inputs are aligned to the asset universe before solving.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>11. Optimizer constraints</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>sum(weights) = 100%; weight bounds apply; superclass minima/maxima apply</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>weight bounds 0.0% to 40.0%; single asset weight ≤ 40.0%</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Superclass ranges: Cash 5.0%-20.0%, Fixed Income 25.0%-55.0%, Equity 35.0%-65.0%, Fund 0.0%-15.0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>12. Risk reality check</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Formula</th>
+                <td>stress estimate = 2 × annual volatility; potential loss = portfolio value × stress estimate</td>
+              </tr>
+              <tr>
+                <th>Values</th>
+                <td>2 × 4.7% = 9.3%; $800,000.00 × 9.3% = $74,713.42</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>Shown before report generation as a simplified stress estimate, not a guarantee.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <section>
+      <div class="eyebrow">Questionnaire Scoring</div>
+      <h2>DOCX-aligned risk bucket calculation.</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th>Method</th>
+            <td>weighted_normalized_sections</td>
+          </tr>
+          <tr>
+            <th>Capacity score</th>
+            <td>39.5%</td>
+          </tr>
+          <tr>
+            <th>Tolerance score</th>
+            <td>58.3%</td>
+          </tr>
+          <tr>
+            <th>Final score before caps</th>
+            <td>47.0%</td>
+          </tr>
+          <tr>
+            <th>Final score after caps</th>
+            <td>47.0%</td>
+          </tr>
+          <tr>
+            <th>Displayed risk score</th>
+            <td>5 / 10</td>
+          </tr>
+          <tr>
+            <th>Draft profile from score</th>
+            <td>Balanced (balanced)</td>
+          </tr>
+          <tr>
+            <th>Final scoring profile</th>
+            <td>Balanced (balanced)</td>
+          </tr>
+          <tr>
+            <th>Applied caps</th>
+            <td>None</td>
+          </tr>
+          <tr>
+            <th>Manual override used</th>
+            <td>No</td>
+          </tr>
+          <tr>
+            <th>Manual override</th>
+            <td>None</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="summary">
+        <div class="panel">
+          <h3>Section scores</h3>
+          <ul class="note-list">
+
+            <li>risk_capacity: 39.5%</li>
+
+            <li>risk_tolerance: 58.3%</li>
+
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Question scores</h3>
+          <ul class="note-list">
+
+            <li>current_emergency_fund_months: 66.7%</li>
+
+            <li>non_investment_income_stability: 50.0%</li>
+
+            <li>dependents_obligations: 50.0%</li>
+
+            <li>time_horizon: 50.0%</li>
+
+            <li>investment_phase: 0.0%</li>
+
+            <li>market_drop_response: 66.7%</li>
+
+            <li>short_term_loss_willingness: 50.0%</li>
+
+            <li>financial_knowledge: 50.0%</li>
+
+            <li>investing_experience_length: 66.7%</li>
+
+            <li>hypothetical_30_loss_reaction: 50.0%</li>
+
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section>
+      <div class="eyebrow">Risk Reality Check</div>
+      <h2>Pre-report volatility stress illustration.</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th>Method</th>
+            <td>two_standard_deviation_volatility_proxy</td>
+          </tr>
+          <tr>
+            <th>Multiplier</th>
+            <td>2.0</td>
+          </tr>
+          <tr>
+            <th>Annual volatility used</th>
+            <td>4.7%</td>
+          </tr>
+          <tr>
+            <th>Stress movement shown</th>
+            <td>9.3%</td>
+          </tr>
+          <tr>
+            <th>Portfolio value</th>
+            <td>$800,000.00</td>
+          </tr>
+          <tr>
+            <th>Stress amount shown</th>
+            <td>$74,713.42</td>
+          </tr>
+          <tr>
+            <th>User action</th>
+            <td>continued_current_profile</td>
+          </tr>
+          <tr>
+            <th>Revised question ids</th>
+            <td>None</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="panel-subtle">
+        This is a simplified stress estimate, not formal VaR and not a promise about losses.
+      </p>
+    </section>
+
+
+
+    <section>
+      <div class="eyebrow">Liquidity Policy Check</div>
+      <h2>Cash-floor compatibility before optimization.</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th>Method</th>
+            <td>cash_floor_from_liquidity_need</td>
+          </tr>
+          <tr>
+            <th>Liquidity bucket</th>
+            <td>Cash</td>
+          </tr>
+          <tr>
+            <th>Formula</th>
+            <td>major expense + monthly expenses * emergency months</td>
+          </tr>
+          <tr>
+            <th>Portfolio value</th>
+            <td>$800,000.00</td>
+          </tr>
+          <tr>
+            <th>Major expense amount</th>
+            <td>$0.00</td>
+          </tr>
+          <tr>
+            <th>Monthly expenses</th>
+            <td>$0.00</td>
+          </tr>
+          <tr>
+            <th>Emergency answer</th>
+            <td>months_0</td>
+          </tr>
+          <tr>
+            <th>Emergency months used</th>
+            <td>0.0</td>
+          </tr>
+          <tr>
+            <th>Required liquidity</th>
+            <td>$0.00</td>
+          </tr>
+          <tr>
+            <th>Liquidity floor</th>
+            <td>0.0%</td>
+          </tr>
+          <tr>
+            <th>Selected profile</th>
+            <td>Balanced (balanced)</td>
+          </tr>
+          <tr>
+            <th>Selected Cash ceiling</th>
+            <td>20.0%</td>
+          </tr>
+          <tr>
+            <th>Selected profile compatible</th>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <th>Effective profile</th>
+            <td>Balanced (balanced)</td>
+          </tr>
+          <tr>
+            <th>Effective Cash ceiling</th>
+            <td>20.0%</td>
+          </tr>
+          <tr>
+            <th>Profile adjusted</th>
+            <td>No</td>
+          </tr>
+          <tr>
+            <th>User action</th>
+            <td>submitted_compatible_profile</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+
+    <section>
+      <div class="eyebrow">Captured Answers</div>
+      <h2>Questionnaire inputs saved for this run.</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Type</th>
+            <th>Used for scoring</th>
+            <th>Used directly in allocation</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>How much are you investing in this portfolio today? The minimum portfolio value for this questionnaire is $25,000.</td>
+            <td>$800,000.00</td>
+            <td>currency_amount</td>
+            <td>no</td>
+            <td>yes</td>
+          </tr>
+
+          <tr>
+            <td>How much might you need to withdraw for a major expense in the next 12 to 24 months?</td>
+            <td>$0.00</td>
+            <td>currency_amount</td>
+            <td>no</td>
+            <td>yes</td>
+          </tr>
+
+          <tr>
+            <td>What are your estimated essential monthly expenses?</td>
+            <td>$0.00</td>
+            <td>currency_amount</td>
+            <td>no</td>
+            <td>yes</td>
+          </tr>
+
+          <tr>
+            <td>How many months of expenses would you like to have set aside for emergencies?</td>
+            <td>0 months</td>
+            <td>single_choice</td>
+            <td>no</td>
+            <td>yes</td>
+          </tr>
+
+          <tr>
+            <td>How many months of expenses have you currently set aside for emergencies?</td>
+            <td>4-6 months</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>How would you describe your non-investment income?</td>
+            <td>Moderately stable</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>To what extent do others depend on your income or financial resources for ongoing support?</td>
+            <td>Two or more people depend on my income</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>When do you expect to need a large amount of money from these investments?</td>
+            <td>6 to 9 years</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>What phase of your investment life would you say you are in?</td>
+            <td>Capital disbursement</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>If the stock market dropped 25% tomorrow and stayed there for two years, what would you do?</td>
+            <td>Do nothing / stay invested</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>How willing are you to accept short-term losses for potential long-term gain?</td>
+            <td>Indifferent</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>How knowledgeable are you about financial and investment concepts?</td>
+            <td>Moderate investment understanding</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>How long have you been investing?</td>
+            <td>4-10 years</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+          <tr>
+            <td>An investor chooses a portfolio expected to produce higher long-term returns but with larger temporary declines. Six months later, the portfolio falls by 30% during a market downturn. What would you think?</td>
+            <td>Market declines are uncomfortable but expected.</td>
+            <td>single_choice</td>
+            <td>yes</td>
+            <td>no</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <div class="eyebrow">Constraints</div>
+      <h2>Profile policy applied before solving.</h2>
+      <div class="summary">
+        <div class="panel">
+          <h3>Superclass minima</h3>
+          <ul class="note-list">
+
+            <li>Cash: 5.0%</li>
+
+            <li>Fixed Income: 25.0%</li>
+
+            <li>Equity: 35.0%</li>
+
+            <li>Fund: 0.0%</li>
+
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Superclass maxima</h3>
+          <ul class="note-list">
+
+            <li>Cash: 20.0%</li>
+
+            <li>Fixed Income: 55.0%</li>
+
+            <li>Equity: 65.0%</li>
+
+            <li>Fund: 15.0%</li>
+
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Applied overlays</h3>
+          <ul class="note-list">
+
+
+            <li>liquidity_cash_floor:0.050000</li>
+
+
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Raw Trace JSON</div>
+      <h2>Machine-readable audit payload.</h2>
+      <pre>{
+  &#34;trace_version&#34;: &#34;decision-trace-v1&#34;,
+  &#34;questionnaire_version&#34;: &#34;v4&#34;,
+  &#34;scoring_version&#34;: &#34;v5&#34;,
+  &#34;portfolio_version&#34;: &#34;v3&#34;,
+  &#34;profile_band&#34;: &#34;balanced&#34;,
+  &#34;profile_label&#34;: &#34;Balanced&#34;,
+  &#34;profile_source&#34;: &#34;scored_questionnaire&#34;,
+  &#34;data_source&#34;: &#34;csv_snapshot&#34;,
+  &#34;optimizer_objective&#34;: &#34;max_sharpe&#34;,
+  &#34;risk_free_rate&#34;: 0.0,
+  &#34;weight_bounds&#34;: [
+    0.0,
+    0.4
+  ],
+  &#34;single_asset_cap&#34;: 0.4,
+  &#34;covariance_psd_repair_enabled&#34;: true,
+  &#34;applied_overlays&#34;: [
+    &#34;liquidity_cash_floor:0.050000&#34;
+  ],
+  &#34;super_class_minima&#34;: {
+    &#34;Cash&#34;: 0.05,
+    &#34;Fixed Income&#34;: 0.25,
+    &#34;Equity&#34;: 0.35,
+    &#34;Fund&#34;: 0.0
+  },
+  &#34;super_class_maxima&#34;: {
+    &#34;Cash&#34;: 0.2,
+    &#34;Fixed Income&#34;: 0.55,
+    &#34;Equity&#34;: 0.65,
+    &#34;Fund&#34;: 0.15
+  },
+  &#34;metric_minima&#34;: {},
+  &#34;metric_maxima&#34;: {},
+  &#34;captured_answers&#34;: [
+    {
+      &#34;question_id&#34;: &#34;portfolio_value&#34;,
+      &#34;question_text&#34;: &#34;How much are you investing in this portfolio today? The minimum portfolio value for this questionnaire is $25,000.&#34;,
+      &#34;answer_type&#34;: &#34;currency_amount&#34;,
+      &#34;answer_label&#34;: &#34;$800,000.00&#34;,
+      &#34;used_for_scoring&#34;: false,
+      &#34;used_for_allocation&#34;: true
+    },
+    {
+      &#34;question_id&#34;: &#34;major_expense_withdrawal_amount&#34;,
+      &#34;question_text&#34;: &#34;How much might you need to withdraw for a major expense in the next 12 to 24 months?&#34;,
+      &#34;answer_type&#34;: &#34;currency_amount&#34;,
+      &#34;answer_label&#34;: &#34;$0.00&#34;,
+      &#34;used_for_scoring&#34;: false,
+      &#34;used_for_allocation&#34;: true
+    },
+    {
+      &#34;question_id&#34;: &#34;essential_monthly_expenses&#34;,
+      &#34;question_text&#34;: &#34;What are your estimated essential monthly expenses?&#34;,
+      &#34;answer_type&#34;: &#34;currency_amount&#34;,
+      &#34;answer_label&#34;: &#34;$0.00&#34;,
+      &#34;used_for_scoring&#34;: false,
+      &#34;used_for_allocation&#34;: true
+    },
+    {
+      &#34;question_id&#34;: &#34;emergency_fund_months&#34;,
+      &#34;question_text&#34;: &#34;How many months of expenses would you like to have set aside for emergencies?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;0 months&#34;,
+      &#34;used_for_scoring&#34;: false,
+      &#34;used_for_allocation&#34;: true
+    },
+    {
+      &#34;question_id&#34;: &#34;current_emergency_fund_months&#34;,
+      &#34;question_text&#34;: &#34;How many months of expenses have you currently set aside for emergencies?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;4-6 months&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;non_investment_income_stability&#34;,
+      &#34;question_text&#34;: &#34;How would you describe your non-investment income?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Moderately stable&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;dependents_obligations&#34;,
+      &#34;question_text&#34;: &#34;To what extent do others depend on your income or financial resources for ongoing support?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Two or more people depend on my income&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;time_horizon&#34;,
+      &#34;question_text&#34;: &#34;When do you expect to need a large amount of money from these investments?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;6 to 9 years&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;investment_phase&#34;,
+      &#34;question_text&#34;: &#34;What phase of your investment life would you say you are in?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Capital disbursement&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;market_drop_response&#34;,
+      &#34;question_text&#34;: &#34;If the stock market dropped 25% tomorrow and stayed there for two years, what would you do?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Do nothing / stay invested&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;short_term_loss_willingness&#34;,
+      &#34;question_text&#34;: &#34;How willing are you to accept short-term losses for potential long-term gain?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Indifferent&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;financial_knowledge&#34;,
+      &#34;question_text&#34;: &#34;How knowledgeable are you about financial and investment concepts?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Moderate investment understanding&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;investing_experience_length&#34;,
+      &#34;question_text&#34;: &#34;How long have you been investing?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;4-10 years&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    },
+    {
+      &#34;question_id&#34;: &#34;hypothetical_30_loss_reaction&#34;,
+      &#34;question_text&#34;: &#34;An investor chooses a portfolio expected to produce higher long-term returns but with larger temporary declines. Six months later, the portfolio falls by 30% during a market downturn. What would you think?&#34;,
+      &#34;answer_type&#34;: &#34;single_choice&#34;,
+      &#34;answer_label&#34;: &#34;Market declines are uncomfortable but expected.&#34;,
+      &#34;used_for_scoring&#34;: true,
+      &#34;used_for_allocation&#34;: false
+    }
+  ],
+  &#34;captured_but_not_used&#34;: [],
+  &#34;limitations&#34;: [
+    &#34;The questionnaire now calculates the proposed investor profile, while advisor review can still override it during the prototype.&#34;,
+    &#34;Numeric liquidity inputs are used for the Cash-floor compatibility check, while the full suitability model is still under development.&#34;,
+    &#34;Expected returns are model inputs and estimates, not guarantees.&#34;,
+    &#34;Covariance PSD repair is a numerical stability step applied before optimization, not a change to the investment policy.&#34;
+  ],
+  &#34;scoring_policy_trace&#34;: {
+    &#34;method&#34;: &#34;weighted_normalized_sections&#34;,
+    &#34;capacity_score&#34;: 0.3950617777777778,
+    &#34;tolerance_score&#34;: 0.5833335,
+    &#34;final_score_before_caps&#34;: 0.47037046666666665,
+    &#34;final_score_after_caps&#34;: 0.47037046666666665,
+    &#34;draft_profile_band&#34;: &#34;balanced&#34;,
+    &#34;draft_profile_label&#34;: &#34;Balanced&#34;,
+    &#34;final_profile_band&#34;: &#34;balanced&#34;,
+    &#34;final_profile_label&#34;: &#34;Balanced&#34;,
+    &#34;applied_caps&#34;: [],
+    &#34;manual_override_used&#34;: false,
+    &#34;manual_override_band&#34;: null,
+    &#34;manual_override_label&#34;: null,
+    &#34;section_scores&#34;: {
+      &#34;risk_capacity&#34;: 0.3950617777777778,
+      &#34;risk_tolerance&#34;: 0.5833335
+    },
+    &#34;question_scores&#34;: {
+      &#34;current_emergency_fund_months&#34;: 0.666667,
+      &#34;non_investment_income_stability&#34;: 0.5,
+      &#34;dependents_obligations&#34;: 0.5,
+      &#34;time_horizon&#34;: 0.5,
+      &#34;investment_phase&#34;: 0.0,
+      &#34;market_drop_response&#34;: 0.666667,
+      &#34;short_term_loss_willingness&#34;: 0.5,
+      &#34;financial_knowledge&#34;: 0.5,
+      &#34;investing_experience_length&#34;: 0.666667,
+      &#34;hypothetical_30_loss_reaction&#34;: 0.5
+    }
+  },
+  &#34;liquidity_policy_check&#34;: {
+    &#34;method&#34;: &#34;cash_floor_from_liquidity_need&#34;,
+    &#34;liquidity_bucket&#34;: &#34;Cash&#34;,
+    &#34;portfolio_value&#34;: 800000.0,
+    &#34;major_expense_withdrawal_amount&#34;: 0.0,
+    &#34;essential_monthly_expenses&#34;: 0.0,
+    &#34;emergency_fund_option_id&#34;: &#34;months_0&#34;,
+    &#34;emergency_months_used&#34;: 0.0,
+    &#34;required_liquidity_amount&#34;: 0.0,
+    &#34;liquidity_floor&#34;: 0.0,
+    &#34;selected_profile_band&#34;: &#34;balanced&#34;,
+    &#34;selected_profile_label&#34;: &#34;Balanced&#34;,
+    &#34;selected_cash_ceiling&#34;: 0.2,
+    &#34;selected_profile_compatible&#34;: true,
+    &#34;effective_profile_band&#34;: &#34;balanced&#34;,
+    &#34;effective_profile_label&#34;: &#34;Balanced&#34;,
+    &#34;effective_cash_ceiling&#34;: 0.2,
+    &#34;profile_adjusted&#34;: false,
+    &#34;user_action&#34;: &#34;submitted_compatible_profile&#34;
+  },
+  &#34;risk_reality_check&#34;: {
+    &#34;method&#34;: &#34;two_standard_deviation_volatility_proxy&#34;,
+    &#34;multiplier&#34;: 2.0,
+    &#34;annual_volatility&#34;: 0.04669588969426824,
+    &#34;stress_percent&#34;: 0.09339177938853647,
+    &#34;portfolio_value&#34;: 800000.0,
+    &#34;stress_amount&#34;: 74713.42,
+    &#34;user_action&#34;: &#34;continued_current_profile&#34;,
+    &#34;revised_question_ids&#34;: []
+  }
+}</pre>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+SOC Advisor Flow Validation
+Generated: 2026-05-13T08:45:38-05:00
+
+Overall result: PASS
+
+Validation claim
+This report checks service-level advisor flow behavior: calculated profiles, manual overrides, liquidity adjustments, risk-check trace persistence, and explanation-trace completeness. It does not validate optimizer math; use run_optimizer_validation.py for that.
+
+Scenario results
+PASS - Calculated questionnaire profile path: Calculated profile Aggressive; manual override recorded as false.
+PASS - Compatible manual override path: Growth override submitted and persisted as manual override.
+PASS - Unknown manual override rejection: Unknown profile rejected with HTTP 400.
+PASS - Manual override automatic liquidity adjustment: Growth override automatically adjusted to Conservative after liquidity check; action=auto_adjusted_to_safer_profile; profile_source=liquidity_adjusted_manual_profile.
+PASS - Scored profile automatic liquidity adjustment: Calculated Aggressive profile adjusted to Conservative automatically after liquidity check; action=auto_adjusted_to_safer_profile; profile_source=liquidity_adjusted_questionnaire.
+PASS - No compatible profile rejection: No compatible profile rejected with clear liquidity policy detail.
+PASS - Risk reality trace preserves override status: Risk reality trace stored and manual override flag preserved.
