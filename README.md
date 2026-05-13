@@ -251,8 +251,11 @@ instead of forcing an infeasible portfolio.
 
 ## How PyPortfolioOpt Is Used
 
-PyPortfolioOpt is the optimization engine used after the system has selected
-the effective investor profile and portfolio constraints.
+[PyPortfolioOpt](https://github.com/PyPortfolio/PyPortfolioOpt) is the
+optimization engine used after the system has selected the effective investor
+profile and portfolio constraints. The library is not deciding the investor
+type; it receives the project's approved inputs, constraints, and objective,
+then solves for portfolio weights inside those limits.
 
 The optimizer receives:
 
@@ -262,6 +265,22 @@ The optimizer receives:
 - broad investment-type constraints from the selected profile
 - a single-asset cap
 - any Cash-floor overlay from the liquidity check
+
+The flow is similar to the standard PyPortfolioOpt workflow:
+
+```text
+SOC asset data
+  -> expected returns
+  -> covariance / risk matrix
+  -> PyPortfolioOpt EfficientFrontier
+  -> project constraints and objective
+  -> cleaned portfolio weights
+  -> holdings, metrics, chat summary, and HTML reports
+```
+
+In other words, the system uses PyPortfolioOpt for the optimization stage, but
+the advisory logic around it is ours: questionnaire scoring, liquidity policy,
+profile constraints, report wording, audit traces, and validation scripts.
 
 The simplified optimizer path is:
 
@@ -298,18 +317,27 @@ Its credibility comes from three layers:
 
 1. it is a known, citable Python library for portfolio optimization work
 2. it implements established Markowitz-style mean-variance optimization ideas
-3. the project independently checks the same constrained problem using SciPy's
-   SLSQP optimizer path
+3. the project independently checks the same constrained problem using
+   [SciPy](https://github.com/scipy/scipy)'s SLSQP optimizer path
 
-The SciPy cross-check matters because SciPy is a general scientific-computing
-library, not a portfolio-specific wrapper. Replaying the same objective,
-expected returns, covariance matrix, bounds, and superclass constraints through
-SciPy gives an independent numerical check that the integration is behaving as
-expected.
+The [SciPy SLSQP cross-check](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html)
+matters because SciPy is a general scientific-computing library, not a
+portfolio-specific wrapper. Replaying the same objective, expected returns,
+covariance matrix, bounds, and superclass constraints through SciPy gives an
+independent numerical check that the integration is behaving as expected.
 
 This does not prove that the recommendation is financially perfect. It supports
 the narrower and more defensible claim: the implementation follows the stated
 rules and the optimizer output can be independently replayed.
+
+Useful references for judges and reviewers:
+
+- [PyPortfolioOpt documentation](https://pyportfolioopt.readthedocs.io/)
+- [PyPortfolioOpt GitHub repository](https://github.com/PyPortfolio/PyPortfolioOpt)
+- [PyPortfolioOpt JOSS paper](https://joss.theoj.org/papers/10.21105/joss.03066)
+- [SciPy documentation](https://docs.scipy.org/doc/scipy/)
+- [SciPy GitHub repository](https://github.com/scipy/scipy)
+- [SciPy SLSQP optimizer documentation](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html)
 
 ## Validation And Testing Evidence
 
